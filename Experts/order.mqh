@@ -1,0 +1,224 @@
+#include "time.mqh"
+#include "valuables.mqh"
+#include "notice.mqh"
+#include "original_methods.mqh"
+
+bool IsCommonConditon(const int ag_pos, const datetime ag_entry_time, const int ag_entry_interval)
+{
+  bool result = (
+                  ag_pos == NO_POSITION &&
+                  TimeCurrent() - ag_entry_time > ag_entry_interval &&
+                  AccountEquity() > min_account_money
+                );
+  return(result);
+};
+
+void AdjustLots(bool &ag_check_history, const int ag_continue_loss, const int ag_MAGIC,
+                double &ag_lots, const double ag_normal_lots, const double ag_min_lots)
+{
+  if (ag_check_history){
+    bool is_normal_lots = true;
+    int histroy_total = OrdersHistoryTotal();
+
+    if (ag_continue_loss <= histroy_total){
+      is_normal_lots = false;
+      int ellement = 0;
+      double trade_results[];
+      ArrayResize(trade_results, ag_continue_loss);
+      ArrayInitialize(trade_results, 0.0);
+
+      for (int i = histroy_total - 1; 0 <= i; i--){
+        if(ag_continue_loss - 1 < ellement){
+          break;
+        };
+
+        bool result = OrderSelect(i,SELECT_BY_POS,MODE_HISTORY);
+        if(
+            OrderMagicNumber() == ag_MAGIC &&
+            OrderProfit() != 0
+          )
+          {
+            trade_results[ellement] = OrderProfit();
+            ellement++;
+          };
+      };
+
+      for (int number = 0; number <= ag_continue_loss - 1; number++){
+        if (0 < trade_results[number]){
+          is_normal_lots = true;
+        };
+      };
+    };
+
+    if (is_normal_lots){
+      ag_lots = ag_normal_lots;
+    } else {
+      ag_lots = ag_min_lots;
+    };
+
+    ag_check_history = false;
+  };
+};
+
+void OrderEntry(int &ag_ticket, const string ag_current, const int ag_opbuy_or_opsell,
+                const double ag_lots, const double ag_ask_or_bid, const int ag_slippage,
+                const int ag_MAGIC, int &ag_pos, double &ag_entry_price, datetime &ag_entry_time,
+                const string ag_ea_name)
+{
+  string order_comment = StringConcatenate(ag_ea_name,",",DoubleToString(Ask,3),",",DoubleToString(Bid,3));
+  ag_ticket = OrderSend(
+                         ag_current,
+                         ag_opbuy_or_opsell,
+                         ag_lots,
+                         ag_ask_or_bid,
+                         ag_slippage,
+                         0,              //loss: no_set
+                         0,              //profit: no_set
+                         order_comment,  //cooment
+                         ag_MAGIC,
+                         0,              //expire: no_set
+                         clrRed
+                       );
+
+  if (ag_ticket != -1){
+    if(ag_opbuy_or_opsell == OP_BUY){
+      ag_pos = BUY_POSITION;
+    } else {
+      ag_pos = SELL_POSITION;
+    };
+    bool result = OrderSelect(ag_ticket, SELECT_BY_TICKET);
+    ag_entry_price = OrderOpenPrice();
+    ag_entry_time = TimeCurrent();
+    string open_email_subject = StringConcatenate(AccountCompany(), ",", ag_ea_name);
+    string open_email_text = StringConcatenate("entry", ",", DoubleToString(ag_entry_price,3), ",", "ask_or_bid", DoubleToString(ag_ask_or_bid,3));
+    SendMail(open_email_subject,open_email_text);
+  } else {
+    SendMail("エントリで本文のエラー発生",IntegerToString(GetLastError()));
+  };
+};
+
+void OrderCloseSetUp(int &ag_pos, bool &ag_check_history)
+{
+  ag_pos = NO_POSITION;
+  ag_check_history = true;
+  NoticeAccountEquity();
+};
+
+void OrderSettleDetail(int &ag_pos, const int ag_ticket, bool &ag_check_history, const int ag_slippage)
+{
+  bool result = OrderSelect(ag_ticket,SELECT_BY_TICKET);
+  double ask_or_bid;
+
+  if (OrderType() == OP_BUY){
+    ask_or_bid = Bid;
+  };
+
+  if (OrderType() == OP_SELL){
+    ask_or_bid = Ask;
+  };
+
+  result = OrderClose(ag_ticket, OrderLots(), ask_or_bid, ag_slippage, clrBlue);
+
+  if (result){
+    OrderCloseSetUp(ag_pos, ag_check_history);
+  } else {
+    SendMail("クロースで本文のエラー発生", IntegerToString(GetLastError()));
+  };
+};
+
+void OrderSettle(int &ag_pos, const int ag_profit, const int ag_loss,const double ag_entry_price,
+                 const int ag_ticket, const int ag_slippage, bool &ag_check_history,
+                 bool &ag_this_ea_close_conditions)
+{
+  bool conditions_buy = (
+                          Bid >= (ag_profit*_Point + ag_entry_price) ||
+                          Bid <= (ag_entry_price - ag_loss*_Point) ||
+                          LocalDayOfWeek() == SATURDAY ||
+                          ag_this_ea_close_conditions
+                        );
+  if (ag_pos == BUY_POSITION && conditions_buy){
+    OrderSettleDetail(ag_pos,ag_ticket,ag_check_history,ag_slippage);
+  };
+
+  bool conditions_sell = (
+                            Ask <= (ag_entry_price - ag_profit*_Point) ||
+                            Ask >= (ag_loss*_Point + ag_entry_price) ||
+                            LocalDayOfWeek() == SATURDAY ||
+                            ag_this_ea_close_conditions
+                         );
+
+  if (ag_pos == SELL_POSITION && conditions_sell){
+    OrderSettleDetail(ag_pos, ag_ticket, ag_check_history, ag_slippage);
+  };
+};
+
+void ForcePriceStop(const int ag_pos, const double ag_force_stop_price, const int ag_slippage)
+{
+  if(
+      LocalMinute() == 14 &&
+      (ag_pos == BUY_POSITION || ag_pos == SELL_POSITION)
+    )
+    {
+      for(int i = 0; i <= OrdersTotal() - 1; i++)
+        {
+          bool result = OrderSelect(i,SELECT_BY_POS);
+          if(OrderProfit() < ag_force_stop_price && OrderType() == OP_BUY && OrderSymbol() == Symbol())
+            {result = OrderClose(OrderTicket(),OrderLots(),Bid,ag_slippage,clrBrown);};
+
+          if(OrderProfit() < ag_force_stop_price && OrderType() == OP_SELL && OrderSymbol() == Symbol())
+            {result = OrderClose(OrderTicket(),OrderLots(),Ask,ag_slippage,clrBrown);};
+
+          if(result)
+            {NoticeAccountEquity();}
+          else
+            {{SendMail("クロースで本文のエラー発生",IntegerToString(GetLastError()));}};
+        };
+    };
+};
+
+void OrderCheck(int &ag_pos, datetime &ag_entry_time, int &ag_entry_interval, bool &ag_common_entry_conditions,
+                bool &ag_this_ea_open_conditions, bool &ag_buy_conditions, bool &ag_sell_conditions,
+                int &ag_entry_start_hour, int &ag_entry_end_hour, const string ag_ea_name, bool &ag_email,
+                bool &ag_is_summer, const int ag_summer_entry_start_hour, const int ag_summer_entry_end_hour,
+                int &ag_ticket, const string ag_current, double &ag_lots, const int ag_slippage,const int ag_MAGIC,
+                double &ag_entry_price, const int ag_profit, const int ag_loss, bool &ag_check_history,
+                const int ag_continue_loss, double &ag_normal_lots, const double ag_min_lots,
+                const int ag_force_stop_price, int &ag_day_start_hour, bool &ag_this_ea_close_conditions
+               )
+{
+  ag_common_entry_conditions = IsCommonConditon(ag_pos, ag_entry_time, ag_entry_interval);
+
+  WeekStartProcess(ag_ea_name, ag_email, ag_is_summer, ag_summer_entry_start_hour,
+                   ag_summer_entry_end_hour, ag_entry_start_hour, ag_entry_end_hour,
+                   ag_day_start_hour);
+
+  EmailStatusChangeTime(ag_email);
+
+// buy-entry
+  if(
+      ag_common_entry_conditions &&
+      ag_this_ea_open_conditions &&
+      ag_buy_conditions
+    ){
+       OrderEntry(ag_ticket, ag_current, OP_BUY, ag_lots, Ask, ag_slippage, ag_MAGIC,
+                  ag_pos, ag_entry_price, ag_entry_time, ag_ea_name);
+     };
+
+// sell-entry
+  if(
+      ag_common_entry_conditions &&
+      ag_this_ea_open_conditions &&
+      ag_sell_conditions
+    ){
+       OrderEntry(ag_ticket, ag_current, OP_SELL, ag_lots, Bid, ag_slippage, ag_MAGIC,
+                 ag_pos, ag_entry_price, ag_entry_time, ag_ea_name);
+     };
+
+// close
+  OrderSettle(ag_pos, ag_profit, ag_loss, ag_entry_price, ag_ticket,
+              ag_slippage, ag_check_history, ag_this_ea_close_conditions);
+  ForcePriceStop(ag_pos, ag_force_stop_price, ag_slippage);
+
+// lots
+  AdjustLots(ag_check_history, ag_continue_loss, ag_MAGIC, ag_lots, ag_normal_lots, ag_min_lots);
+};
