@@ -1,21 +1,20 @@
 #property strict
 #include "proxy.mqh"
 
-string ea_name = "5_usjp_koyo";
+string ea_name = "4_5_10_sell";
 
-#define MAGIC 5
+#define MAGIC 4
 #define COMMENT ea_name    // max: 12
-
 double lots = 0.01;
 string current = USDJPY;
 
-input double input_normal_lots = 0.01;
-input double input_min_lots = 0.01;
-input int input_profit = 75;
-input int input_loss = 70;
+input double input_normal_lots = 1.0;
+input double input_min_lots = 0.1;
+input int input_profit = 200;
+input int input_loss = 120;
 input int input_continue_loss = 3;
-input int input_entry_interval = 216000;
-input int input_summer_entry_start_hour = 12;
+input int input_entry_interval = 300;
+input int input_summer_entry_start_hour = 0;
 input int input_summer_entry_end_hour = 24;
 
 double normal_lots = input_normal_lots;
@@ -27,24 +26,22 @@ int entry_interval = input_entry_interval;
 int summer_entry_start_hour = input_summer_entry_start_hour;
 int summer_entry_end_hour = input_summer_entry_end_hour;
 
-int entry_hour = 21;
-int summer_entry_hour = entry_hour;
-int entry_minute = 31;
-
-bool this_ea_open_conditions = false;
+bool this_ea_open_conditions = true;
 bool this_ea_close_conditions = false;
 
-// 23時台にエントリするeaでなければ0にする
-int entry_day_of_week = 0;
-int summer_entry_day_of_week = 0;
+int summer_entry_hour = 9;
+int entry_hour = 9;
+int entry_minute = 55;
 
 void OnInit(){
+  buy_conditions = false;
+
   WeekStartEmail(ea_name, email);
   SummerTimeUpdate(is_summer, day_start_hour);
   // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
   //                     summer_entry_start_hour, summer_entry_end_hour);
-  EntryHourUpdate(entry_hour, summer_entry_hour,
-                  entry_day_of_week, summer_entry_day_of_week);
+  // EntryHourUpdate(entry_hour, summer_entry_hour,
+  //                 entry_day_of_week, summer_entry_day_of_week);
   SetLastEntryTime(entry_time, MAGIC);
 };
 
@@ -54,27 +51,22 @@ void OnTick(){
     SummerTimeUpdate(is_summer, day_start_hour);
     // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
     //                     summer_entry_start_hour, summer_entry_end_hour);
-    EntryHourUpdate(entry_hour, summer_entry_hour,
-                    entry_day_of_week, summer_entry_day_of_week);
+    // EntryHourUpdate(entry_hour, summer_entry_hour,
+    //                 entry_day_of_week, summer_entry_day_of_week);
     SetLastEntryTime(entry_time, MAGIC);
   };
 
-
-  if (IsCheckConditionTime(entry_hour, entry_minute)) {
+  if (IsCheckConditionTime(entry_hour, entry_minute)){
     common_entry_conditions = IsCommonConditon(pos, entry_time, entry_interval);
-    this_ea_open_conditions = (
-                                IsFirstWeek() &&
-                                LocalDayOfWeek() == FRIDAY &&
-                                LocalHour() == entry_hour &&
-                                LocalMinute() == entry_minute
-                              );
-
-    buy_conditions = (iOpen(NULL,1,1) < iClose(NULL,1,1));
-    sell_conditions = (iOpen(NULL,1,1) > iClose(NULL,1,1));
+    sell_conditions = (
+                        IsWeekDay() &&
+                        IsGoToBi() &&
+                        LocalHour() == entry_hour &&
+                        LocalMinute() == entry_minute
+                      );
   };
 
   if (IsEntryOneMinuteLater(entry_hour, entry_minute)){
-    ChangeEntryCondition(buy_conditions);
     ChangeEntryCondition(sell_conditions);
   };
 
@@ -88,4 +80,4 @@ void OnTick(){
            this_ea_close_conditions, force_stop_price);
 
   AdjustLots(check_history, continue_loss, MAGIC, lots, normal_lots, min_lots);
-};
+}

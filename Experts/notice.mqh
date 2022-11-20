@@ -1,23 +1,7 @@
 #include "time.mqh"
+#include "order.mqh"
 #include "valuables.mqh"
 #include "original_methods.mqh"
-
-void EmailStatusChangeTime(bool &ag_email) {  
-  int day_start_hour;
-  if (SUMMER_TIME_START_DAY <= DayOfYear() && DayOfYear() <= SUMMER_TIME_END_DAY) {
-    day_start_hour = SUMMER_DAY_START_HOUR;
-  } else {
-    day_start_hour = WINTER_DAY_START_HOUR;
-  };
-
-  if(
-      LocalDayOfWeek() == MONDAY &&
-      LocalHour() == day_start_hour &&
-      LocalMinute() == 31
-    ){
-      ag_email = true;
-    };
-};
 
 void TenSecondsIntervalMail(const int ag_timeframe, const int ag_make_number, double &ag_highs[],
                             double &ag_lows[], double &ag_opens[], double &ag_closes[],
@@ -71,12 +55,12 @@ void TenSecondsIntervalMail(const int ag_timeframe, const int ag_make_number, do
   if (is_calc_hour && local_minute == mail_minutes && send == false){
       send = true;
       string describe;
-      for (int i=0; i <= ag_make_number-1; i++){
+      for (int number=0; number <= ag_make_number-1; number++){
         describe = StringConcatenate(
-                    "highs",StringConcatenate(i),",",DoubleToString(ag_highs[i],3),
-                    "lows",StringConcatenate(i),",",DoubleToString(ag_lows[i],3),
-                    "opens",StringConcatenate(i),",",DoubleToString(ag_opens[i],3),
-                    "closes",StringConcatenate(i),",",DoubleToString(ag_closes[i],3)
+                    "highs",StringConcatenate(number),",",DoubleToString(ag_highs[number],3),
+                    "lows",StringConcatenate(number),",",DoubleToString(ag_lows[number],3),
+                    "opens",StringConcatenate(number),",",DoubleToString(ag_opens[number],3),
+                    "closes",StringConcatenate(number),",",DoubleToString(ag_closes[number],3)
                   );
       };
       SendMail(title, describe);

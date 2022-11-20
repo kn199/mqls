@@ -60,14 +60,14 @@ void AdjustLots(bool &ag_check_history, const int ag_continue_loss, const int ag
   };
 };
 
-void OrderEntry(int &ag_ticket, const string ag_current, const int ag_opbuy_or_opsell,
-                const double ag_lots, const double ag_ask_or_bid, const int ag_slippage,
-                const int ag_MAGIC, int &ag_pos, double &ag_entry_price, datetime &ag_entry_time,
-                const string ag_ea_name)
+void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
+           const double ag_ask_or_bid, const int ag_slippage, const int ag_MAGIC,
+           int &ag_pos, double &ag_entry_price, datetime &ag_entry_time,
+           const string ag_ea_name)
 {
   string order_comment = StringConcatenate(ag_ea_name,",",DoubleToString(Ask,3),",",DoubleToString(Bid,3));
   ag_ticket = OrderSend(
-                         ag_current,
+                         Symbol(),
                          ag_opbuy_or_opsell,
                          ag_lots,
                          ag_ask_or_bid,
@@ -86,27 +86,21 @@ void OrderEntry(int &ag_ticket, const string ag_current, const int ag_opbuy_or_o
     } else {
       ag_pos = SELL_POSITION;
     };
-    bool result = OrderSelect(ag_ticket, SELECT_BY_TICKET);
+    OrderSelect(ag_ticket, SELECT_BY_TICKET);
     ag_entry_price = OrderOpenPrice();
     ag_entry_time = TimeCurrent();
     string open_email_subject = StringConcatenate(AccountCompany(), ",", ag_ea_name);
-    string open_email_text = StringConcatenate("entry", ",", DoubleToString(ag_entry_price,3), ",", "ask_or_bid", DoubleToString(ag_ask_or_bid,3));
-    SendMail(open_email_subject,open_email_text);
+    string open_email_text = StringConcatenate("entry", ",", DoubleToString(ag_entry_price, 3), ",",
+                                               "ask_or_bid", DoubleToString(ag_ask_or_bid, 3));
+    SendMail(open_email_subject, open_email_text);
   } else {
-    SendMail("エントリで本文のエラー発生",IntegerToString(GetLastError()));
+    SendMail("エントリで本文のエラー発生", IntegerToString(GetLastError()));
   };
-};
-
-void OrderCloseSetUp(int &ag_pos, bool &ag_check_history)
-{
-  ag_pos = NO_POSITION;
-  ag_check_history = true;
-  NoticeAccountEquity();
 };
 
 void OrderSettleDetail(int &ag_pos, const int ag_ticket, bool &ag_check_history, const int ag_slippage)
 {
-  bool result = OrderSelect(ag_ticket,SELECT_BY_TICKET);
+  bool result = OrderSelect(ag_ticket, SELECT_BY_TICKET);
   double ask_or_bid;
 
   if (OrderType() == OP_BUY){
@@ -120,7 +114,8 @@ void OrderSettleDetail(int &ag_pos, const int ag_ticket, bool &ag_check_history,
   result = OrderClose(ag_ticket, OrderLots(), ask_or_bid, ag_slippage, clrBlue);
 
   if (result){
-    OrderCloseSetUp(ag_pos, ag_check_history);
+    ag_pos = NO_POSITION;
+    ag_check_history = true;
   } else {
     SendMail("クロースで本文のエラー発生", IntegerToString(GetLastError()));
   };
@@ -130,25 +125,42 @@ void OrderSettle(int &ag_pos, const int ag_profit, const int ag_loss,const doubl
                  const int ag_ticket, const int ag_slippage, bool &ag_check_history,
                  bool &ag_this_ea_close_conditions)
 {
-  bool conditions_buy = (
+  bool conditions_buy = ag_pos == BUY_POSITION &&
+                        (
                           Bid >= (ag_profit*_Point + ag_entry_price) ||
-                          Bid <= (ag_entry_price - ag_loss*_Point) ||
-                          LocalDayOfWeek() == SATURDAY ||
-                          ag_this_ea_close_conditions
+                          Bid <= (ag_entry_price - ag_loss*_Point)
                         );
-  if (ag_pos == BUY_POSITION && conditions_buy){
-    OrderSettleDetail(ag_pos,ag_ticket,ag_check_history,ag_slippage);
-  };
 
-  bool conditions_sell = (
+  bool conditions_sell = ag_pos == SELL_POSITION && 
+                         (
                             Ask <= (ag_entry_price - ag_profit*_Point) ||
-                            Ask >= (ag_loss*_Point + ag_entry_price) ||
-                            LocalDayOfWeek() == SATURDAY ||
-                            ag_this_ea_close_conditions
+                            Ask >= (ag_loss*_Point + ag_entry_price)
                          );
 
-  if (ag_pos == SELL_POSITION && conditions_sell){
-    OrderSettleDetail(ag_pos, ag_ticket, ag_check_history, ag_slippage);
+  if (LocalDayOfWeek() == SATURDAY ||
+      ag_this_ea_close_conditions ||
+      conditions_buy ||
+      conditions_sell)
+  {
+    bool result = OrderSelect(ag_ticket, SELECT_BY_TICKET);
+    double ask_or_bid;
+
+    if (OrderType() == OP_BUY){
+      ask_or_bid = Bid;
+    };
+
+    if (OrderType() == OP_SELL){
+      ask_or_bid = Ask;
+    };
+
+    result = OrderClose(ag_ticket, OrderLots(), ask_or_bid, ag_slippage, clrBlue);
+
+    if (result){
+      ag_pos = NO_POSITION;
+      ag_check_history = true;
+    } else {
+      SendMail("クロースで本文のエラー発生", IntegerToString(GetLastError()));
+    };
   };
 };
 
@@ -161,64 +173,46 @@ void ForcePriceStop(const int ag_pos, const double ag_force_stop_price, const in
     {
       for(int i = 0; i <= OrdersTotal() - 1; i++)
         {
-          bool result = OrderSelect(i,SELECT_BY_POS);
-          if(OrderProfit() < ag_force_stop_price && OrderType() == OP_BUY && OrderSymbol() == Symbol())
-            {result = OrderClose(OrderTicket(),OrderLots(),Bid,ag_slippage,clrBrown);};
+          bool result = OrderSelect(i, SELECT_BY_POS);
+          if (OrderProfit() < ag_force_stop_price && OrderSymbol() == Symbol()){
+            double bid_or_ask;
+            if (OrderType() == OP_BUY){bid_or_ask = Bid;};
+            if (OrderType() == OP_SELL){bid_or_ask = Ask;};
+            result = OrderClose(OrderTicket(), OrderLots(), bid_or_ask, ag_slippage, clrBrown);
+          };
 
-          if(OrderProfit() < ag_force_stop_price && OrderType() == OP_SELL && OrderSymbol() == Symbol())
-            {result = OrderClose(OrderTicket(),OrderLots(),Ask,ag_slippage,clrBrown);};
-
-          if(result)
-            {NoticeAccountEquity();}
-          else
-            {{SendMail("クロースで本文のエラー発生",IntegerToString(GetLastError()));}};
+          if(result){
+            NoticeAccountEquity();
+          } else {
+            SendMail("クローズで本文のエラー発生", IntegerToString(GetLastError()));
+          };
         };
     };
 };
 
-void OrderCheck(int &ag_pos, datetime &ag_entry_time, int &ag_entry_interval, bool &ag_common_entry_conditions,
-                bool &ag_this_ea_open_conditions, bool &ag_buy_conditions, bool &ag_sell_conditions,
-                int &ag_entry_start_hour, int &ag_entry_end_hour, const string ag_ea_name, bool &ag_email,
-                bool &ag_is_summer, const int ag_summer_entry_start_hour, const int ag_summer_entry_end_hour,
-                int &ag_ticket, const string ag_current, double &ag_lots, const int ag_slippage,const int ag_MAGIC,
-                double &ag_entry_price, const int ag_profit, const int ag_loss, bool &ag_check_history,
-                const int ag_continue_loss, double &ag_normal_lots, const double ag_min_lots,
-                const int ag_force_stop_price, int &ag_day_start_hour, bool &ag_this_ea_close_conditions
-               )
+void OrderEntry(bool &ag_common_entry_conditions, bool &ag_this_ea_open_conditions,
+                bool &ag_buy_conditions, bool &ag_sell_conditions, int &ag_ticket,
+                double &ag_lots, const int ag_slippage, const int ag_MAGIC, int &ag_pos,
+                double &ag_entry_price, datetime &ag_entry_time, const string ag_ea_name)
 {
-  ag_common_entry_conditions = IsCommonConditon(ag_pos, ag_entry_time, ag_entry_interval);
+  if (ag_common_entry_conditions && ag_this_ea_open_conditions){
+    if (ag_buy_conditions) {
+       Entry(ag_ticket, OP_BUY, ag_lots, Ask, ag_slippage, ag_MAGIC,
+             ag_pos, ag_entry_price, ag_entry_time, ag_ea_name);
+    };
 
-  WeekStartProcess(ag_ea_name, ag_email, ag_is_summer, ag_summer_entry_start_hour,
-                   ag_summer_entry_end_hour, ag_entry_start_hour, ag_entry_end_hour,
-                   ag_day_start_hour);
-
-  EmailStatusChangeTime(ag_email);
-
-// buy-entry
-  if(
-      ag_common_entry_conditions &&
-      ag_this_ea_open_conditions &&
-      ag_buy_conditions
-    ){
-       OrderEntry(ag_ticket, ag_current, OP_BUY, ag_lots, Ask, ag_slippage, ag_MAGIC,
-                  ag_pos, ag_entry_price, ag_entry_time, ag_ea_name);
+    if (ag_sell_conditions) {
+       Entry(ag_ticket, OP_SELL, ag_lots, Bid, ag_slippage, ag_MAGIC,
+             ag_pos, ag_entry_price, ag_entry_time, ag_ea_name);
      };
+  };
+};
 
-// sell-entry
-  if(
-      ag_common_entry_conditions &&
-      ag_this_ea_open_conditions &&
-      ag_sell_conditions
-    ){
-       OrderEntry(ag_ticket, ag_current, OP_SELL, ag_lots, Bid, ag_slippage, ag_MAGIC,
-                 ag_pos, ag_entry_price, ag_entry_time, ag_ea_name);
-     };
-
-// close
+void OrderEnd(int &ag_pos, const int ag_profit, const int ag_loss, double &ag_entry_price,
+              int &ag_ticket, const int ag_slippage, bool &ag_check_history,
+              bool &ag_this_ea_close_conditions, const double ag_force_stop_price)
+{
   OrderSettle(ag_pos, ag_profit, ag_loss, ag_entry_price, ag_ticket,
               ag_slippage, ag_check_history, ag_this_ea_close_conditions);
   ForcePriceStop(ag_pos, ag_force_stop_price, ag_slippage);
-
-// lots
-  AdjustLots(ag_check_history, ag_continue_loss, ag_MAGIC, ag_lots, ag_normal_lots, ag_min_lots);
 };

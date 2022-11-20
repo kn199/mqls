@@ -36,6 +36,8 @@ bool buy_conditions = false;
 bool sell_conditions = false;
 bool is_summer;
 datetime entry_time;
+int entry_start_hour;
+int entry_end_hour;
 bool email;
 bool check_history = true;
 int day_start_hour = SUMMER_DAY_START_HOUR;

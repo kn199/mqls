@@ -1,4 +1,7 @@
 #include "valuables.mqh"
+#include "time.mqh"
+#include "valuables.mqh"
+#include "notice.mqh"
 
 bool IntInclude(int &ag_int_array[], int target) {
   bool is_include = false;

@@ -1,5 +1,7 @@
 #include "valuables.mqh"
 #include "original_methods.mqh"
+#include "order.mqh"
+#include "valuables.mqh"
 
 int LocalSecond() {
   return(TimeSeconds(TimeLocal()));
@@ -45,7 +47,43 @@ bool IsFifteenTimesMinute() {
 }
 
 bool IsWeekDay() {
-  return(1 <= TimeDayOfWeek(TimeLocal()) <= 5);
+  return(1 <= LocalDayOfWeek() <= 5);
+}
+
+int DayStartHour() {
+  int hour ;
+  if (IsSummerTime()) {
+    hour = SUMMER_DAY_START_HOUR;
+  } else {
+    hour = WINTER_DAY_START_HOUR;
+  };
+
+  return(hour);
+}
+
+bool IsDayStartTime() {
+  int hour ;
+  if (IsSummerTime()) {
+    hour = SUMMER_DAY_START_HOUR;
+  } else {
+    hour = WINTER_DAY_START_HOUR;
+  };
+
+  bool result = (LocalHour() == hour && LocalMinute() == 30);
+
+  return(result);
+}
+
+bool IsWeekStart() {
+  int hour = DayStartHour();
+
+  bool result = (
+    LocalDayOfWeek() == MONDAY &&
+    LocalHour() == hour &&
+    LocalMinute() == 30
+  );
+
+  return(result);
 }
 
 bool IsFirstWeek() {
@@ -71,67 +109,76 @@ bool IsFifthWeek() {
   return(29 <= day);
 }
 
-void TimeUpdate(int &ag_day_start_hour, bool &ag_is_summer, int &ag_summer_entry_start_hour,
-                int &ag_summer_entry_end_hour, int &ag_entry_start_hour, int &ag_entry_end_hour,
-                datetime &ag_entry_time, const int ag_MAGIC, bool ag_is_init,
-                int ag_summer_entry_hour, int &entry_hour)
+bool IsEntryOneMinuteLater(const int entry_hour, const int entry_minute) {
+  bool result = (LocalHour() == entry_hour && LocalMinute() == (entry_minute + 1) );
+  return(result);
+}
+
+void ChangeEntryCondition(bool &change_conditions){
+  change_conditions = false;
+};
+
+bool IsCheckConditionTime(int entry_hour, int entry_minute)
 {
-  if (ag_is_init || (ag_is_init == false && LocalHour() == ag_day_start_hour && LocalMinute() == 6 )) {
-    SummerTimeAdjust(ag_is_summer, ag_summer_entry_start_hour, ag_summer_entry_end_hour,
-                     ag_entry_start_hour, ag_entry_end_hour, ag_day_start_hour,
-                     ag_summer_entry_hour, entry_hour);
-    SetLastEntryTime(ag_entry_time,ag_MAGIC);
-  }
-}
-
-void ChangeCommonCondition(int entry_hour, int entry_minute, bool &common_entry_conditions) {
-  if (LocalHour() == entry_hour && LocalMinute() == (entry_minute + 1)) {
-    common_entry_conditions = false;
-  };
-}
-
-bool IsCheckConditionTime(int entry_hour, int entry_minute) {
   bool result = (LocalHour() == entry_hour && LocalMinute() == (entry_minute));
   return(result);
 }
 
-void WeekStartProcess(const string ag_ea_name, bool &ag_email, bool &ag_is_summer,
-                      const int ag_summer_entry_start_hour, const int ag_summer_entry_end_hour,
-                      int &ag_entry_start_hour, int &ag_entry_end_hour, int &ag_day_start_hour)
+void WeekStartEmail(const string ag_ea_name, bool &ag_email)
 {
+  if(IsWeekStart()){
+    if (ag_email){
+      string open_email_text = StringConcatenate(AccountCompany(), ",", ag_ea_name);
+      SendMail("週初めの開始連絡", open_email_text);
+    };
+
+    ag_email = false;
+  };
+
   if(
       LocalDayOfWeek() == MONDAY &&
-      LocalHour() == ag_day_start_hour &&
-      LocalMinute() == 30
-    )
-    {
-      if (ag_email){
-        string open_email_text = StringConcatenate(AccountCompany(), ",", ag_ea_name);
-        SendMail("週初めの開始連絡", open_email_text);
-      };
-      ag_email = false;
+      LocalHour() == DayStartHour() &&
+      LocalMinute() == 31 &&
+      ag_email == false
+    ){
+      ag_email = true;
     };
-};
+}
 
-void SummerTimeAdjust(bool &ag_is_summer, const int ag_summer_entry_start_hour, const int ag_summer_entry_end_hour,
-                      int &ag_entry_start_hour, int &ag_entry_end_hour, int &ag_day_start_hour,
-                      int ag_summer_entry_hour, int &ag_entry_hour)
+void SummerTimeUpdate(bool &ag_is_summer, int &ag_day_start_hour)
 {
   if (IsSummerTime()){
-      ag_is_summer = true;
+    ag_is_summer = true;
+    ag_day_start_hour = SUMMER_DAY_START_HOUR;
+  } else {
+    ag_is_summer = false;
+    ag_day_start_hour = WINTER_DAY_START_HOUR;
+  };
+}
+
+void EntryStartEndUpdate(int &ag_entry_start_hour, int &ag_entry_end_hour,
+                         const int ag_summer_entry_start_hour, const int ag_summer_entry_end_hour)
+{
+  if (IsSummerTime()){
       ag_entry_start_hour = ag_summer_entry_start_hour;
       ag_entry_end_hour = ag_summer_entry_end_hour;
-      ag_day_start_hour = SUMMER_DAY_START_HOUR;
-      ag_entry_hour = ag_summer_entry_hour;
   } else {
-      ag_is_summer = false;
       ag_entry_start_hour = ag_summer_entry_start_hour + 1;
       ag_entry_end_hour = ag_summer_entry_end_hour + 1;
-      ag_day_start_hour = WINTER_DAY_START_HOUR;
+  };
+}
+
+void EntryHourUpdate(int &ag_entry_hour, int ag_summer_entry_hour,
+                     int &ag_entry_day_of_week, int &ag_summer_entry_day_of_week)
+{
+  if (IsSummerTime()){
+      ag_entry_hour = ag_summer_entry_hour;
+  } else {
       ag_entry_hour = ag_summer_entry_hour + 1;
       if (ag_entry_hour == 24) {
         ag_entry_hour == 0;
-      };;
+        ag_entry_day_of_week = ag_summer_entry_day_of_week + 1;
+      };
   };
 };
 
