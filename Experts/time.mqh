@@ -150,7 +150,7 @@ void WeekStartEmail(const string ag_ea_name, bool &ag_email)
     };
 }
 
-void SummerTimeUpdate(int &ag_day_start_hour)
+void DayStartHourUpdate(int &ag_day_start_hour)
 {
   if (IsSummerTime()){
     ag_day_start_hour = SUMMER_DAY_START_HOUR;
@@ -171,17 +171,24 @@ void EntryStartEndUpdate(int &ag_entry_start_hour, int &ag_entry_end_hour,
   };
 }
 
-void EntryHourUpdate(int &ag_entry_hour, int ag_summer_entry_hour,
-                     int &ag_entry_day_of_week, int ag_summer_entry_day_of_week)
+void EntryHourUpdate(int &ag_entry_hour, int ag_summer_entry_hour)
 {
   if (IsSummerTime()){
-      ag_entry_hour = ag_summer_entry_hour;
+    ag_entry_hour = ag_summer_entry_hour;
   } else {
-      ag_entry_hour = ag_summer_entry_hour + 1;
-      if (ag_entry_hour == 24) {
-        ag_entry_hour == 0;
-        ag_entry_day_of_week = ag_summer_entry_day_of_week + 1;
-      };
+    ag_entry_hour = ag_summer_entry_hour + 1;
+  };
+};
+
+void EntryHourUpdateOverDay(int &ag_entry_hour, int ag_summer_entry_hour,
+                            int &ag_entry_day_of_week, int ag_summer_entry_day_of_week)
+{
+  if (IsSummerTime()){
+    ag_entry_hour = ag_summer_entry_hour;
+    ag_entry_day_of_week = ag_summer_entry_day_of_week;
+  } else {
+    ag_entry_hour = 0;
+    ag_entry_day_of_week = ag_summer_entry_day_of_week + 1;
   };
 };
 

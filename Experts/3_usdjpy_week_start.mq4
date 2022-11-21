@@ -42,21 +42,20 @@ void OnInit(){
   sell_conditions = false;
 
   WeekStartEmail(ea_name, email);
-  SummerTimeUpdate(is_summer, day_start_hour);
+  DayStartHourUpdate(day_start_hour);
   // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
   //                     summer_entry_start_hour, summer_entry_end_hour);
-  EntryHourUpdate(entry_hour, summer_entry_hour,
-                  entry_day_of_week, summer_entry_day_of_week);
-  SetLastEntryTime(entry_time, MAGIC);};
+  EntryHourUpdate(entry_hour, summer_entry_hour);
+  SetLastEntryTime(entry_time, MAGIC);
+};
 
 void OnTick(){
   if (IsDayStartTime()) {
     WeekStartEmail(ea_name, email);
-    SummerTimeUpdate(is_summer, day_start_hour);
+    DayStartHourUpdate(day_start_hour);
     // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
     //                     summer_entry_start_hour, summer_entry_end_hour);
-    EntryHourUpdate(entry_hour, summer_entry_hour,
-                    entry_day_of_week, summer_entry_day_of_week);
+    EntryHourUpdate(entry_hour, summer_entry_hour);
     SetLastEntryTime(entry_time, MAGIC);
   };
 
