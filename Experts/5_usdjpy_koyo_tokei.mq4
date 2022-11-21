@@ -40,7 +40,7 @@ int summer_entry_day_of_week = 0;
 
 void OnInit(){
   WeekStartEmail(ea_name, email);
-  SummerTimeUpdate(is_summer, day_start_hour);
+  SummerTimeUpdate(day_start_hour);
   // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
   //                     summer_entry_start_hour, summer_entry_end_hour);
   EntryHourUpdate(entry_hour, summer_entry_hour,
@@ -51,7 +51,7 @@ void OnInit(){
 void OnTick(){
   if (IsDayStartTime()) {
     WeekStartEmail(ea_name, email);
-    SummerTimeUpdate(is_summer, day_start_hour);
+    SummerTimeUpdate(day_start_hour);
     // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
     //                     summer_entry_start_hour, summer_entry_end_hour);
     EntryHourUpdate(entry_hour, summer_entry_hour,

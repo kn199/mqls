@@ -3,7 +3,6 @@
 //+-----------------------------------------------------------------------+
 #property strict
 #include "common.mqh"
-#include "time.mqh"
 
 input string server_name = "kagoya_1";
 input string company = "";
@@ -60,7 +59,18 @@ void OnTick(){
 
   sell_conditions = (iOpen(NULL,1,1) > iClose(NULL,1,1));
 
-  ToDoTick(pos,entry_time,entry_interval,common_entry_conditions,this_ea_open_conditions,buy_conditions,sell_conditions,entry_start_hour,entry_end_hour,server_name,company,ea_name,
-           email,is_summer,summer_entry_start_hour,summer_entry_end_hour,ticket,current,lots,slippage,MAGIC,entry_price,profit,loss,check_history,
-           continue_loss,normal_lots,min_lots,force_stop_price,day_start_hour,this_ea_close_conditions);
+
+
+
+
+
+  ToDoTick(pos,entry_time,entry_interval,common_entry_conditions,
+              this_ea_open_conditions, buy_conditions,sell_conditions,
+              entry_start_hour,entry_end_hour,server_name,ea_name,
+              email,is_summer,summer_entry_start_hour,summer_entry_end_hour,
+              ticket,current,lots,slippage,MAGIC,
+              entry_price,
+              profit,loss,check_history,continue_loss,normal_lots,
+              min_lots,force_stop_price,day_start_hour,this_ea_close_conditions
+             );
 };

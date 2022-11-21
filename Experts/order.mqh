@@ -8,7 +8,8 @@ bool IsCommonConditon(const int ag_pos, const datetime ag_entry_time, const int 
   bool result = (
                   ag_pos == NO_POSITION &&
                   TimeCurrent() - ag_entry_time > ag_entry_interval &&
-                  AccountEquity() > min_account_money
+                  AccountEquity() > min_account_money &&
+                  IsWeekDay()
                 );
   return(result);
 };
@@ -98,31 +99,9 @@ void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
   };
 };
 
-void OrderSettleDetail(int &ag_pos, const int ag_ticket, bool &ag_check_history, const int ag_slippage)
-{
-  bool result = OrderSelect(ag_ticket, SELECT_BY_TICKET);
-  double ask_or_bid;
-
-  if (OrderType() == OP_BUY){
-    ask_or_bid = Bid;
-  };
-
-  if (OrderType() == OP_SELL){
-    ask_or_bid = Ask;
-  };
-
-  result = OrderClose(ag_ticket, OrderLots(), ask_or_bid, ag_slippage, clrBlue);
-
-  if (result){
-    ag_pos = NO_POSITION;
-    ag_check_history = true;
-  } else {
-    SendMail("クロースで本文のエラー発生", IntegerToString(GetLastError()));
-  };
-};
-
-void OrderSettle(int &ag_pos, const int ag_profit, const int ag_loss,const double ag_entry_price,
-                 const int ag_ticket, const int ag_slippage, bool &ag_check_history,
+void OrderSettle(int &ag_pos, const int ag_profit, const int ag_loss,
+                 const double ag_entry_price, const int ag_ticket,
+                 const int ag_slippage, bool &ag_check_history,
                  bool &ag_this_ea_close_conditions)
 {
   bool conditions_buy = ag_pos == BUY_POSITION &&
@@ -137,7 +116,8 @@ void OrderSettle(int &ag_pos, const int ag_profit, const int ag_loss,const doubl
                             Ask >= (ag_loss*_Point + ag_entry_price)
                          );
 
-  if (LocalDayOfWeek() == SATURDAY ||
+  bool saturday_pos = (LocalDayOfWeek() == SATURDAY && ag_pos != 0);
+  if (saturday_pos ||
       ag_this_ea_close_conditions ||
       conditions_buy ||
       conditions_sell)

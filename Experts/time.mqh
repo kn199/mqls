@@ -23,8 +23,12 @@ int LocalDay() {
   return(TimeDay(TimeLocal()));
 };
 
+int LocalDayOfYear() {
+  return(TimeDayOfYear(TimeLocal()));
+};
+
 bool IsSummerTime() {
-  int local_day = LocalDay();
+  int local_day = LocalDayOfYear();
   return(SUMMER_TIME_START_DAY <= local_day && local_day <= SUMMER_TIME_END_DAY);
 }
 
@@ -47,7 +51,8 @@ bool IsFifteenTimesMinute() {
 }
 
 bool IsWeekDay() {
-  return(1 <= LocalDayOfWeek() <= 5);
+  int day = LocalDayOfWeek();
+  return(MONDAY <= day && day <= FRIDAY);
 }
 
 int DayStartHour() {
@@ -145,13 +150,11 @@ void WeekStartEmail(const string ag_ea_name, bool &ag_email)
     };
 }
 
-void SummerTimeUpdate(bool &ag_is_summer, int &ag_day_start_hour)
+void SummerTimeUpdate(int &ag_day_start_hour)
 {
   if (IsSummerTime()){
-    ag_is_summer = true;
     ag_day_start_hour = SUMMER_DAY_START_HOUR;
   } else {
-    ag_is_summer = false;
     ag_day_start_hour = WINTER_DAY_START_HOUR;
   };
 }
@@ -169,7 +172,7 @@ void EntryStartEndUpdate(int &ag_entry_start_hour, int &ag_entry_end_hour,
 }
 
 void EntryHourUpdate(int &ag_entry_hour, int ag_summer_entry_hour,
-                     int &ag_entry_day_of_week, int &ag_summer_entry_day_of_week)
+                     int &ag_entry_day_of_week, int ag_summer_entry_day_of_week)
 {
   if (IsSummerTime()){
       ag_entry_hour = ag_summer_entry_hour;

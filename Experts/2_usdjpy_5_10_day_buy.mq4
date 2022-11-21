@@ -67,13 +67,15 @@ void OnTick(){
                       IsGoToBi() &&
                       LocalHour() == entry_hour &&
                       LocalMinute() == entry_minute &&
-                      is_summer
+                      IsSummerTime()
                     );
   };
 
   this_ea_close_conditions = (
                                LocalHour() == close_hour &&
-                               LocalMinute() == close_minutes
+                               LocalMinute() == close_minutes &&
+                               pos != 0 &&
+                               IsSummerTime()
                              );
 
   if (IsEntryOneMinuteLater(entry_hour, entry_minute)){
