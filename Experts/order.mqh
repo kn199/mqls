@@ -63,10 +63,8 @@ void AdjustLots(bool &ag_check_history, const int ag_continue_loss, const int ag
 
 void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
            const double ag_ask_or_bid, const int ag_slippage, const int ag_MAGIC,
-           int &ag_pos, double &ag_entry_price, datetime &ag_entry_time,
-           const string ag_ea_name)
+           int &ag_pos, double &ag_entry_price, datetime &ag_entry_time)
 {
-  string order_comment = StringConcatenate(ag_ea_name,",",DoubleToString(Ask,3),",",DoubleToString(Bid,3));
   ag_ticket = OrderSend(
                          Symbol(),
                          ag_opbuy_or_opsell,
@@ -75,9 +73,9 @@ void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
                          ag_slippage,
                          0,              //loss: no_set
                          0,              //profit: no_set
-                         order_comment,  //cooment
+                         WindowExpertName(),  //cooment
                          ag_MAGIC,
-                         0,              //expire: no_set
+                         0,                   //expire: no_set
                          clrRed
                        );
 
@@ -90,12 +88,13 @@ void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
     OrderSelect(ag_ticket, SELECT_BY_TICKET);
     ag_entry_price = OrderOpenPrice();
     ag_entry_time = TimeCurrent();
-    string open_email_subject = StringConcatenate(AccountCompany(), ",", ag_ea_name);
+
+    string open_email_subject = StringConcatenate(AccountCompany(), ",", WindowExpertName());
     string open_email_text = StringConcatenate("entry", ",", DoubleToString(ag_entry_price, 3), ",",
                                                "ask_or_bid", DoubleToString(ag_ask_or_bid, 3));
     SendMail(open_email_subject, open_email_text);
   } else {
-    SendMail("エントリで本文のエラー発生", IntegerToString(GetLastError()));
+    SendMail("エントリでメール本文のエラー発生", IntegerToString(GetLastError()));
   };
 };
 
@@ -173,17 +172,17 @@ void ForcePriceStop(const int ag_pos, const double ag_force_stop_price, const in
 void OrderEntry(bool &ag_common_entry_conditions, bool &ag_this_ea_open_conditions,
                 bool &ag_buy_conditions, bool &ag_sell_conditions, int &ag_ticket,
                 double &ag_lots, const int ag_slippage, const int ag_MAGIC, int &ag_pos,
-                double &ag_entry_price, datetime &ag_entry_time, const string ag_ea_name)
+                double &ag_entry_price, datetime &ag_entry_time)
 {
   if (ag_common_entry_conditions && ag_this_ea_open_conditions){
     if (ag_buy_conditions) {
        Entry(ag_ticket, OP_BUY, ag_lots, Ask, ag_slippage, ag_MAGIC,
-             ag_pos, ag_entry_price, ag_entry_time, ag_ea_name);
+             ag_pos, ag_entry_price, ag_entry_time);
     };
 
     if (ag_sell_conditions) {
        Entry(ag_ticket, OP_SELL, ag_lots, Bid, ag_slippage, ag_MAGIC,
-             ag_pos, ag_entry_price, ag_entry_time, ag_ea_name);
+             ag_pos, ag_entry_price, ag_entry_time);
      };
   };
 };

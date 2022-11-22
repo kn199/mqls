@@ -1,10 +1,8 @@
 #property strict
 #include "proxy.mqh"
 
-string ea_name = "4_5_10_sell";
-
 #define MAGIC 4
-#define COMMENT ea_name    // max: 12
+
 double lots = 0.01;
 string current = USDJPY;
 
@@ -36,7 +34,7 @@ int entry_minute = 55;
 void OnInit(){
   buy_conditions = false;
 
-  WeekStartEmail(ea_name, email);
+  WeekStartEmail(email);
   DayStartHourUpdate(day_start_hour);
   // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
   //                     summer_entry_start_hour, summer_entry_end_hour);
@@ -46,7 +44,7 @@ void OnInit(){
 
 void OnTick(){
   if (IsDayStartTime()) {
-    WeekStartEmail(ea_name, email);
+    WeekStartEmail(email);
     DayStartHourUpdate(day_start_hour);
     // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
     //                     summer_entry_start_hour, summer_entry_end_hour);
@@ -71,7 +69,7 @@ void OnTick(){
   OrderEntry(common_entry_conditions, this_ea_open_conditions,
              buy_conditions, sell_conditions, ticket,
              lots, slippage, MAGIC, pos,
-             entry_price, entry_time, ea_name);
+             entry_price, entry_time);
 
   OrderEnd(pos, profit, loss, entry_price,
            ticket, slippage, check_history,

@@ -1,10 +1,7 @@
 #property strict
 #include "proxy.mqh"
 
-string ea_name = "3_usdjpy_week_start";
-
 #define MAGIC 3
-#define COMMENT ea_name    // max: 12
 
 double lots = 0.01;
 string current = USDJPY;
@@ -34,14 +31,10 @@ int entry_minute = 6;
 bool this_ea_open_conditions = false;
 bool this_ea_close_conditions = false;
 
-// 23時台にエントリするeaでなければ0にする
-int entry_day_of_week = 0;
-int summer_entry_day_of_week = 0;
-
 void OnInit(){
   sell_conditions = false;
 
-  WeekStartEmail(ea_name, email);
+  WeekStartEmail(email);
   DayStartHourUpdate(day_start_hour);
   // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
   //                     summer_entry_start_hour, summer_entry_end_hour);
@@ -51,7 +44,7 @@ void OnInit(){
 
 void OnTick(){
   if (IsDayStartTime()) {
-    WeekStartEmail(ea_name, email);
+    WeekStartEmail(email);
     DayStartHourUpdate(day_start_hour);
     // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
     //                     summer_entry_start_hour, summer_entry_end_hour);
@@ -67,17 +60,17 @@ void OnTick(){
                                 LocalMinute() == entry_minute
                               );
 
-    buy_conditions = iOpen(current,PERIOD_M5,0) > iClose(current,PERIOD_M5,1);
+    buy_conditions = iOpen(current, PERIOD_M5, 0) > iClose(current, PERIOD_M5, 1);
   };
 
   if (IsEntryOneMinuteLater(entry_hour, entry_minute)){
-    ChangeEntryCondition(sell_conditions);
+    ChangeEntryCondition(buy_conditions);
   };
 
   OrderEntry(common_entry_conditions, this_ea_open_conditions,
              buy_conditions, sell_conditions, ticket,
              lots, slippage, MAGIC, pos,
-             entry_price, entry_time, ea_name);
+             entry_price, entry_time);
 
   OrderEnd(pos, profit, loss, entry_price,
            ticket, slippage, check_history,

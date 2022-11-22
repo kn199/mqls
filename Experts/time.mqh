@@ -129,11 +129,11 @@ bool IsCheckConditionTime(int entry_hour, int entry_minute)
   return(result);
 }
 
-void WeekStartEmail(const string ag_ea_name, bool &ag_email)
+void WeekStartEmail(bool &ag_email)
 {
   if(IsWeekStart()){
     if (ag_email){
-      string open_email_text = StringConcatenate(AccountCompany(), ",", ag_ea_name);
+      string open_email_text = StringConcatenate(AccountCompany(), ",", WindowExpertName());
       SendMail("週初めの開始連絡", open_email_text);
     };
 
