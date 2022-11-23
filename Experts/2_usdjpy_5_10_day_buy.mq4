@@ -25,7 +25,7 @@ bool this_ea_close_conditions = false;
 void OnInit(){
   sell_conditions = false;
 
-  EaStop(current);
+  EaStopCheck(current);
   WeekStartEmail(email);
   day_start_hour = DayStartHourUpdate();
   // entry_start_hour = EntryStartUpdate(twelve);
@@ -36,7 +36,7 @@ void OnInit(){
 
 void OnTick(){
   if (IsDayStartTime()) {
-    EaStop(current);
+    EaStopCheck(current);
     WeekStartEmail(email);
     day_start_hour = DayStartHourUpdate();
     // entry_start_hour = EntryStartUpdate(twelve);
@@ -48,7 +48,6 @@ void OnTick(){
   if (IsCheckConditionTime(entry_hour, entry_minute)) {
     common_entry_conditions = IsCommonConditon(pos, entry_time, entry_interval);
     buy_conditions = (
-                      IsWeekDay() &&
                       IsGoToBi() &&
                       LocalHour() == entry_hour &&
                       LocalMinute() == entry_minute &&
@@ -69,12 +68,10 @@ void OnTick(){
 
   OrderEntry(common_entry_conditions, this_ea_open_conditions,
              buy_conditions, sell_conditions, ticket,
-             lots, slippage, MAGIC, pos,
-             entry_price, entry_time);
+             lots, MAGIC, pos, entry_price, entry_time);
 
   OrderEnd(pos, profit, loss, entry_price,
-           ticket, slippage, check_history,
-           this_ea_close_conditions, force_stop_price);
+           ticket, check_history, this_ea_close_conditions);
 
   AdjustLots(check_history, continue_loss, MAGIC, lots, normal_lots, min_lots);
 }

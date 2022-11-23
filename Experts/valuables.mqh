@@ -5,13 +5,13 @@
 #define SUMMER_TIME_END_DAY 309
 #define SUMMER_DAY_START_HOUR 6
 #define WINTER_DAY_START_HOUR 7
+#define SANDAY 0
 #define MONDAY 1
 #define TUESDAY 2
 #define WEDNESDAY 3
 #define THIRDSDAY 4
 #define FRIDAY 5
 #define SATURDAY 6
-#define SANDAY 7
 
 #define USDJPY "USDJPY"
 #define EURUSD "EURUSD"

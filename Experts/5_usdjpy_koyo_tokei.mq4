@@ -20,23 +20,23 @@ bool this_ea_open_conditions = false;
 bool this_ea_close_conditions = false;
 
 void OnInit(){
-  EaStop(current);
+  EaStopCheck(current);
   WeekStartEmail(email);
   day_start_hour = DayStartHourUpdate();
   // entry_start_hour = EntryStartUpdate(twelve);
   // entry_end_hour = EntryEndUpdate(twenty_four);
-  entry_hour = EntryHourUpdate(entry_hour);
+  entry_hour = EntryHourUpdate(twenty_one);
   entry_time = SetLastEntryTime(MAGIC);
 };
 
 void OnTick(){
   if (IsDayStartTime()) {
-    EaStop(current);
+    EaStopCheck(current);
     WeekStartEmail(email);
     day_start_hour = DayStartHourUpdate();
     // entry_start_hour = EntryStartUpdate(twelve);
     // entry_end_hour = EntryEndUpdate(twenty_four);
-    entry_hour = EntryHourUpdate(entry_hour);
+    entry_hour = EntryHourUpdate(twenty_one);
     entry_time = SetLastEntryTime(MAGIC);
   };
 
@@ -49,9 +49,10 @@ void OnTick(){
                                 LocalMinute() == entry_minute
                               );
 
-    buy_conditions = (iOpen(NULL,1,1) < iClose(NULL,1,1));
-    sell_conditions = (iOpen(NULL,1,1) > iClose(NULL,1,1));
+    buy_conditions = (iOpen(current,1,1) < iClose(current,1,1));
+    sell_conditions = (iOpen(current,1,1) > iClose(current,1,1));
   };
+
 
   if (IsEntryOneMinuteLater(entry_hour, entry_minute)){
     ChangeEntryCondition(buy_conditions);
@@ -60,12 +61,11 @@ void OnTick(){
 
   OrderEntry(common_entry_conditions, this_ea_open_conditions,
              buy_conditions, sell_conditions, ticket,
-             lots, slippage, MAGIC, pos,
-             entry_price, entry_time);
+             lots, MAGIC, pos, entry_price, entry_time);
 
   OrderEnd(pos, profit, loss, entry_price,
-           ticket, slippage, check_history,
-           this_ea_close_conditions, force_stop_price);
+           ticket, check_history, this_ea_close_conditions);
 
   AdjustLots(check_history, continue_loss, MAGIC, lots, normal_lots, min_lots);
+
 };

@@ -62,15 +62,15 @@ void AdjustLots(bool &ag_check_history, const int ag_continue_loss, const int ag
 };
 
 void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
-           const double ag_ask_or_bid, const int ag_slippage, const int ag_MAGIC,
-           int &ag_pos, double &ag_entry_price, datetime &ag_entry_time)
+           const double ag_ask_or_bid, const int ag_MAGIC, int &ag_pos,
+           double &ag_entry_price, datetime &ag_entry_time)
 {
   ag_ticket = OrderSend(
                          Symbol(),
                          ag_opbuy_or_opsell,
                          ag_lots,
                          ag_ask_or_bid,
-                         ag_slippage,
+                         slippage,
                          0,              //loss: no_set
                          0,              //profit: no_set
                          WindowExpertName(),  //cooment
@@ -100,8 +100,7 @@ void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
 
 void OrderSettle(int &ag_pos, const int ag_profit, const int ag_loss,
                  const double ag_entry_price, const int ag_ticket,
-                 const int ag_slippage, bool &ag_check_history,
-                 bool &ag_this_ea_close_conditions)
+                 bool &ag_check_history, bool &ag_this_ea_close_conditions)
 {
   bool conditions_buy = ag_pos == BUY_POSITION &&
                         (
@@ -132,7 +131,7 @@ void OrderSettle(int &ag_pos, const int ag_profit, const int ag_loss,
       ask_or_bid = Ask;
     };
 
-    result = OrderClose(ag_ticket, OrderLots(), ask_or_bid, ag_slippage, clrBlue);
+    result = OrderClose(ag_ticket, OrderLots(), ask_or_bid, slippage, clrBlue);
 
     if (result){
       ag_pos = NO_POSITION;
@@ -143,7 +142,7 @@ void OrderSettle(int &ag_pos, const int ag_profit, const int ag_loss,
   };
 };
 
-void ForcePriceStop(const int ag_pos, const double ag_force_stop_price, const int ag_slippage)
+void ForcePriceStop(const int ag_pos)
 {
   if(
       LocalMinute() == 14 &&
@@ -153,11 +152,11 @@ void ForcePriceStop(const int ag_pos, const double ag_force_stop_price, const in
       for(int i = 0; i <= OrdersTotal() - 1; i++)
         {
           bool result = OrderSelect(i, SELECT_BY_POS);
-          if (OrderProfit() < ag_force_stop_price && OrderSymbol() == Symbol()){
+          if (OrderProfit() < force_stop_price && OrderSymbol() == Symbol()){
             double bid_or_ask;
             if (OrderType() == OP_BUY){bid_or_ask = Bid;};
             if (OrderType() == OP_SELL){bid_or_ask = Ask;};
-            result = OrderClose(OrderTicket(), OrderLots(), bid_or_ask, ag_slippage, clrBrown);
+            result = OrderClose(OrderTicket(), OrderLots(), bid_or_ask, slippage, clrBrown);
           };
 
           if(result){
@@ -171,27 +170,26 @@ void ForcePriceStop(const int ag_pos, const double ag_force_stop_price, const in
 
 void OrderEntry(bool &ag_common_entry_conditions, bool &ag_this_ea_open_conditions,
                 bool &ag_buy_conditions, bool &ag_sell_conditions, int &ag_ticket,
-                double &ag_lots, const int ag_slippage, const int ag_MAGIC, int &ag_pos,
+                double &ag_lots, const int ag_MAGIC, int &ag_pos,
                 double &ag_entry_price, datetime &ag_entry_time)
 {
   if (ag_common_entry_conditions && ag_this_ea_open_conditions){
     if (ag_buy_conditions) {
-       Entry(ag_ticket, OP_BUY, ag_lots, Ask, ag_slippage, ag_MAGIC,
+       Entry(ag_ticket, OP_BUY, ag_lots, Ask, ag_MAGIC,
              ag_pos, ag_entry_price, ag_entry_time);
     };
 
     if (ag_sell_conditions) {
-       Entry(ag_ticket, OP_SELL, ag_lots, Bid, ag_slippage, ag_MAGIC,
+       Entry(ag_ticket, OP_SELL, ag_lots, Bid, ag_MAGIC,
              ag_pos, ag_entry_price, ag_entry_time);
      };
   };
 };
 
 void OrderEnd(int &ag_pos, const int ag_profit, const int ag_loss, double &ag_entry_price,
-              int &ag_ticket, const int ag_slippage, bool &ag_check_history,
-              bool &ag_this_ea_close_conditions, const double ag_force_stop_price)
+              int &ag_ticket, bool &ag_check_history, bool &ag_this_ea_close_conditions)
 {
   OrderSettle(ag_pos, ag_profit, ag_loss, ag_entry_price, ag_ticket,
-              ag_slippage, ag_check_history, ag_this_ea_close_conditions);
-  ForcePriceStop(ag_pos, ag_force_stop_price, ag_slippage);
+              ag_check_history, ag_this_ea_close_conditions);
+  ForcePriceStop(ag_pos);
 };

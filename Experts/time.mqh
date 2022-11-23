@@ -52,7 +52,8 @@ bool IsFifteenTimesMinute() {
 
 bool IsWeekDay() {
   int day = LocalDayOfWeek();
-  return(MONDAY <= day && day <= FRIDAY);
+  bool result = (MONDAY <= day && day <= FRIDAY);
+  return(result);
 }
 
 int DayStartHour() {
@@ -125,7 +126,7 @@ void ChangeEntryCondition(bool &change_conditions){
 
 bool IsCheckConditionTime(int entry_hour, int entry_minute)
 {
-  bool result = (LocalHour() == entry_hour && LocalMinute() == (entry_minute));
+  bool result = (LocalHour() == entry_hour && LocalMinute() == entry_minute);
   return(result);
 }
 

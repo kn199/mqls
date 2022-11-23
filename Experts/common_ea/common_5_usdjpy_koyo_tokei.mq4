@@ -46,7 +46,7 @@ void OnTick(){
    else
     {hour = 22;};
 
-  common_entry_conditions = IsCommonConditon(pos,entry_time,entry_interval);
+  common_entry_conditions = IsCommonConditon(pos, entry_time, entry_interval);
   this_ea_close_conditions = false;
   this_ea_open_conditions = (
                               TimeDay(TimeLocal()) < 8 &&

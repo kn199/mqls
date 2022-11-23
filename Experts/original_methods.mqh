@@ -15,8 +15,8 @@ bool IntInclude(int &ag_int_array[], int target) {
 };
 
 void EaStop(const string text) {
-  Print(text);
-  SendMail("本文の理由でEAを停止しました", text);
+  Print("EaStop関数によりEAを停止しました。", text);
+  SendMail("EaStop関数によりEAを停止しました。", text);
   ExpertRemove();
 };
 
@@ -25,7 +25,7 @@ void EaStopCheck(const string current) {
     EaStop("設定通貨が異なります。");
   }
 
-  if (min_account_money < AccountEquity()){
+  if (AccountEquity() < min_account_money){
     EaStop("設定した最小証拠金を下回っています。");
   }
 };
