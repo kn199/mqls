@@ -150,36 +150,55 @@ void WeekStartEmail(bool &ag_email)
     };
 }
 
-void DayStartHourUpdate(int &ag_day_start_hour)
+int DayStartHourUpdate()
 {
+  int hour;
   if (IsSummerTime()){
-    ag_day_start_hour = SUMMER_DAY_START_HOUR;
+    hour = SUMMER_DAY_START_HOUR;
   } else {
-    ag_day_start_hour = WINTER_DAY_START_HOUR;
+    hour = WINTER_DAY_START_HOUR;
   };
+
+  return(hour);
 }
 
-void EntryStartEndUpdate(int &ag_entry_start_hour, int &ag_entry_end_hour,
-                         const int ag_summer_entry_start_hour, const int ag_summer_entry_end_hour)
+int EntryStartUpdate(int &number)
 {
+  int hour;
   if (IsSummerTime()){
-      ag_entry_start_hour = ag_summer_entry_start_hour;
-      ag_entry_end_hour = ag_summer_entry_end_hour;
+      hour = number;
   } else {
-      ag_entry_start_hour = ag_summer_entry_start_hour + 1;
-      ag_entry_end_hour = ag_summer_entry_end_hour + 1;
+      hour = number + 1;
   };
+
+  return(hour);
 }
 
-void EntryHourUpdate(int &ag_entry_hour, int ag_summer_entry_hour)
+int EntryEndUpdate(const int number)
 {
+  int hour;
   if (IsSummerTime()){
-    ag_entry_hour = ag_summer_entry_hour;
+      hour = number;
   } else {
-    ag_entry_hour = ag_summer_entry_hour + 1;
+      hour = number + 1;
   };
+
+  return(hour);
+}
+
+int EntryHourUpdate(const int number)
+{
+  int hour;
+  if (IsSummerTime()){
+    hour = number;
+  } else {
+    hour = number + 1;
+  };
+
+  return(hour);
 };
 
+// 夏時間23時にエントリする場合、冬時間0で曜日をずらす処理を行う
 void EntryHourUpdateOverDay(int &ag_entry_hour, int ag_summer_entry_hour,
                             int &ag_entry_day_of_week, int ag_summer_entry_day_of_week)
 {
@@ -192,34 +211,30 @@ void EntryHourUpdateOverDay(int &ag_entry_hour, int ag_summer_entry_hour,
   };
 };
 
-void SetLastEntryTime(datetime &ag_entry_time, const int ag_MAGIC)
+datetime SetLastEntryTime(const int ag_MAGIC)
 {
-  int history_total = OrdersHistoryTotal() - 1;
-  int max_loop = 100;
-  int loop_count;
+  datetime entry_time;
+  int array[2] = {100, 0};
+  // なぜか上で直接OrdersHistoryTotal()を代入できない。
+  array[1] = OrdersHistoryTotal();
+  int loop_count = array[ArrayMinimum(array, WHOLE_ARRAY, 0)];
 
-  if (history_total < max_loop){
-    loop_count = history_total;
-  } else {
-    loop_count = max_loop;
-  };
-
-  bool is_insert = false;
   // OrderSelectの第一引数が大きいほど最近だろうから降順でループ
   for (int i = loop_count; 0 <= i; i--){
-    if (is_insert == false){
-      bool result = OrderSelect(i, SELECT_BY_POS, MODE_HISTORY);
-      if (result && OrderMagicNumber() == ag_MAGIC){
-        ag_entry_time = OrderOpenTime();
-        is_insert = true;
+    if (OrderSelect(i, SELECT_BY_POS, MODE_HISTORY) && OrderMagicNumber() == ag_MAGIC){
+      entry_time = OrderOpenTime();
+      if(entry_time != NULL) {
+        break;
       };
     };
   };
   
-  // 前回エントリがないので、intervalの制限にひっかからないような時間を設定 nullはNG
-  if (is_insert == false){
-    ag_entry_time = D'1980.07.19 12:30:27';
+  // 前回エントリが直近でないので、intervalの制限にひっかからないような時間を設定 nullはNG
+  if (entry_time == NULL){
+    entry_time = D'1980.07.19 12:30:27';
   };
+
+  return(entry_time);
 };
 
 // 1w:10080, 4h:240, 1h: 60

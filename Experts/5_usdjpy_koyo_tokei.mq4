@@ -6,54 +6,37 @@
 double lots = 0.01;
 string current = USDJPY;
 
-input double input_normal_lots = 0.01;
-input double input_min_lots = 0.01;
-input int input_profit = 75;
-input int input_loss = 70;
-input int input_continue_loss = 3;
-input int input_entry_interval = 216000;
-input int input_summer_entry_start_hour = 12;
-input int input_summer_entry_end_hour = 24;
+input double normal_lots = 0.01;
+input double min_lots = 0.01;
+input int profit = 75;
+input int loss = 70;
+input int continue_loss = 3;
+input int entry_interval = 216000;
 
-double normal_lots = input_normal_lots;
-double min_lots = input_min_lots;
-int profit = input_profit;
-int loss = input_loss;
-int continue_loss = input_continue_loss;
-int entry_interval = input_entry_interval;
-int summer_entry_start_hour = input_summer_entry_start_hour;
-int summer_entry_end_hour = input_summer_entry_end_hour;
-
-int entry_hour = 21;
-int summer_entry_hour = entry_hour;
+int entry_hour = twenty_one;
 int entry_minute = 31;
 
 bool this_ea_open_conditions = false;
 bool this_ea_close_conditions = false;
 
-// 23時台にエントリするeaでなければ0にする
-int entry_day_of_week = 0;
-int summer_entry_day_of_week = 0;
-
 void OnInit(){
   WeekStartEmail(email);
-  DayStartHourUpdate(day_start_hour);
-  // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
-  //                     summer_entry_start_hour, summer_entry_end_hour);
-  EntryHourUpdate(entry_hour, summer_entry_hour);
-  SetLastEntryTime(entry_time, MAGIC);
+  day_start_hour = DayStartHourUpdate();
+  // entry_start_hour = EntryStartUpdate(twelve);
+  // entry_end_hour = EntryEndUpdate(twenty_four);
+  entry_hour = EntryHourUpdate(entry_hour);
+  entry_time = SetLastEntryTime(MAGIC);
 };
 
 void OnTick(){
   if (IsDayStartTime()) {
     WeekStartEmail(email);
-    DayStartHourUpdate(day_start_hour);
-    // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
-    //                     summer_entry_start_hour, summer_entry_end_hour);
-    EntryHourUpdate(entry_hour, summer_entry_hour);
-    SetLastEntryTime(entry_time, MAGIC);
+    day_start_hour = DayStartHourUpdate();
+    // entry_start_hour = EntryStartUpdate(twelve);
+    // entry_end_hour = EntryEndUpdate(twenty_four);
+    entry_hour = EntryHourUpdate(entry_hour);
+    entry_time = SetLastEntryTime(MAGIC);
   };
-
 
   if (IsCheckConditionTime(entry_hour, entry_minute)) {
     common_entry_conditions = IsCommonConditon(pos, entry_time, entry_interval);

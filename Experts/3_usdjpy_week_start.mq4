@@ -6,26 +6,14 @@
 double lots = 0.01;
 string current = USDJPY;
 
-input double input_normal_lots = 1.0;
-input double input_min_lots = 0.1;
-input int input_profit = 300;
-input int input_loss = 150;
-input int input_continue_loss = 3;
-input int input_entry_interval = 300;
-input int input_summer_entry_start_hour = 0;
-input int input_summer_entry_end_hour = 24;
-
-double normal_lots = input_normal_lots;
-double min_lots = input_min_lots;
-int summer_entry_start_hour = input_summer_entry_start_hour;
-int summer_entry_end_hour = input_summer_entry_end_hour;
-int entry_interval = input_entry_interval;
-int continue_loss = input_continue_loss;
-int profit = input_profit;
-int loss = input_loss;
+input double normal_lots = 1.0;
+input double min_lots = 0.1;
+input int profit = 300;
+input int loss = 150;
+input int continue_loss = 3;
+input int entry_interval = 300;
 
 int entry_hour = day_start_hour;
-int summer_entry_hour = day_start_hour;
 int entry_minute = 6;
 
 bool this_ea_open_conditions = false;
@@ -35,21 +23,21 @@ void OnInit(){
   sell_conditions = false;
 
   WeekStartEmail(email);
-  DayStartHourUpdate(day_start_hour);
-  // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
-  //                     summer_entry_start_hour, summer_entry_end_hour);
-  EntryHourUpdate(entry_hour, summer_entry_hour);
-  SetLastEntryTime(entry_time, MAGIC);
+  day_start_hour = DayStartHourUpdate();
+  // entry_start_hour = EntryStartUpdate(twelve);
+  // entry_end_hour = EntryEndUpdate(twenty_four);
+  entry_hour = EntryHourUpdate(entry_hour);
+  entry_time = SetLastEntryTime(MAGIC);
 };
 
 void OnTick(){
   if (IsDayStartTime()) {
     WeekStartEmail(email);
-    DayStartHourUpdate(day_start_hour);
-    // EntryStartEndUpdate(entry_start_hour, entry_end_hour,
-    //                     summer_entry_start_hour, summer_entry_end_hour);
-    EntryHourUpdate(entry_hour, summer_entry_hour);
-    SetLastEntryTime(entry_time, MAGIC);
+    day_start_hour = DayStartHourUpdate();
+    // entry_start_hour = EntryStartUpdate(twelve);
+    // entry_end_hour = EntryEndUpdate(twenty_four);
+    entry_hour = EntryHourUpdate(entry_hour);
+    entry_time = SetLastEntryTime(MAGIC);
   };
 
   if (IsCheckConditionTime(entry_hour, entry_minute)) {
