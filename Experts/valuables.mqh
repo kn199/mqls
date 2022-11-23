@@ -17,15 +17,10 @@
 #define EURUSD "EURUSD"
 #define EURJPY "EURJPY"
 
-input double input_force_stop_price = -1000000.0;
-double force_stop_price = input_force_stop_price;
+input double force_stop_price = -1000000.0;
+input double min_account_money = 1000.0;
 
-input double input_min_account_money = 1000.0;
-double min_account_money = input_min_account_money;
-
-input int input_slippage = 3;
-int slippage = input_slippage;
-
+input int slippage = 3;
 int day;
 
 int ticket = 0;

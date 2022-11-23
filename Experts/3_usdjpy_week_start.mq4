@@ -22,6 +22,7 @@ bool this_ea_close_conditions = false;
 void OnInit(){
   sell_conditions = false;
 
+  EaStop(current);
   WeekStartEmail(email);
   day_start_hour = DayStartHourUpdate();
   // entry_start_hour = EntryStartUpdate(twelve);
@@ -32,6 +33,7 @@ void OnInit(){
 
 void OnTick(){
   if (IsDayStartTime()) {
+    EaStop(current);
     WeekStartEmail(email);
     day_start_hour = DayStartHourUpdate();
     // entry_start_hour = EntryStartUpdate(twelve);

@@ -25,6 +25,7 @@ int day_of_week = WEDNESDAY;
 int entry_day_of_week = day_of_week;
 
 void OnInit(){
+  EaStop(current);
   WeekStartEmail(email);
   day_start_hour = DayStartHourUpdate();
   // entry_start_hour = EntryStartUpdate(twelve);
@@ -36,6 +37,7 @@ void OnInit(){
 
 void OnTick(){
   if (IsDayStartTime()) {
+    EaStop(current);
     WeekStartEmail(email);
     EntryHourUpdateOverDay(entry_hour, twenty_three,
                            entry_day_of_week, WEDNESDAY);
