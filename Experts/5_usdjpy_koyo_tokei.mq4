@@ -49,8 +49,8 @@ void OnTick(){
                                 LocalMinute() == entry_minute
                               );
 
-    buy_conditions = (iOpen(current,1,1) < iClose(current,1,1));
-    sell_conditions = (iOpen(current,1,1) > iClose(current,1,1));
+    buy_conditions = IsUp(1, 1);
+    sell_conditions = IsDown(1, 1);
   };
 
 

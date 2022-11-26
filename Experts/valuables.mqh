@@ -17,6 +17,9 @@
 #define EURUSD "EURUSD"
 #define EURJPY "EURJPY"
 
+#define UP 1
+#define DOWN 2
+
 input double force_stop_price = -1000000.0;
 input double min_account_money = 1000.0;
 
@@ -79,3 +82,4 @@ int twenty_one = 21;
 int twenty_two = 22;
 int twenty_three = 23;
 int twenty_four = 24;
+
