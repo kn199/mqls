@@ -58,3 +58,59 @@ bool IsDown(const int timeframe, const int shift) {
 
   return(result);
 }
+
+bool IsHighUp(const int timeframe, const int shift) {
+  bool result;
+  result = (iHigh(NULL, timeframe, shift + 1) < iHigh(NULL, timeframe, shift));
+
+  return(result);
+}
+
+bool IsHighDown(const int timeframe, const int shift) {
+  bool result;
+  result = (iHigh(NULL, timeframe, shift + 1) > iHigh(NULL, timeframe, shift));
+
+  return(result);
+}
+
+bool IsLowUp(const int timeframe, const int shift) {
+  bool result;
+  result = (iLow(NULL, timeframe, shift + 1) < iLow(NULL, timeframe, shift));
+
+  return(result);
+}
+
+bool IsLowDown(const int timeframe, const int shift) {
+  bool result;
+  result = (iLow(NULL, timeframe, shift + 1) > iLow(NULL, timeframe, shift));
+
+  return(result);
+}
+
+bool IsOpenUp(const int timeframe, const int shift) {
+  bool result;
+  result = (iOpen(NULL, timeframe, shift + 1) < iOpen(NULL, timeframe, shift));
+
+  return(result);
+}
+
+bool IsOpenDown(const int timeframe, const int shift) {
+  bool result;
+  result = (iOpen(NULL, timeframe, shift + 1) > iOpen(NULL, timeframe, shift));
+
+  return(result);
+}
+
+bool IsCloseUp(const int timeframe, const int shift) {
+  bool result;
+  result = (iClose(NULL, timeframe, shift + 1) < iClose(NULL, timeframe, shift));
+
+  return(result);
+}
+
+bool IsCloseDown(const int timeframe, const int shift) {
+  bool result;
+  result = (iClose(NULL, timeframe, shift + 1) > iClose(NULL, timeframe, shift));
+
+  return(result);
+}
