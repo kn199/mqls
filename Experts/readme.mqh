@@ -26,3 +26,21 @@ int OnInit(){
 
 // input hogeの変数は、コード上で再代入するとエラーになる。
 // start_hourを動的に変更する、かつinputでも設定する場合はエラー
+
+// スプレッドが0.2pipsの時、バックテストでは2と入力
+// コード的には以下で取得できる
+// int MarketInfo(Symbol(),MODE_SPREAD);
+// landでは0.9なのでバックテストでは1.0にしておく
+
+// datetime
+// 引き算すると秒数になる
+// TimeLocal() を使う
+
+// slippage … どれだけずれて約定してもいいか。USDJPYが小数点以下3桁の価格まで表示されるFX会社の場合、1ポイント＝0.001円
+// https://memoja.net/p/oanyb2a/
+// titan,landともに3桁表示
+// Print(Point());
+// 0.001
+// Print(Digits());
+// 3
+// slippage 3なら0.003ずれて良い？多分。
