@@ -51,9 +51,10 @@ void OnTick(){
     ChangeEntryCondition(two_buy_conditions);
   };
 
-  OrderEntry(two_common_entry_conditions, two_open_conditions,
-             two_buy_conditions, two_sell_conditions, two_ticket,
-             two_lots, TWO_MAGIC, two_pos, two_entry_price, two_entry_time);
+  if (BasicCondition(two_common_entry_conditions, two_open_conditions)){
+    OrderEntry(two_buy_conditions, two_sell_conditions, two_ticket,
+               two_lots, TWO_MAGIC, two_pos, two_entry_price, two_entry_time);
+  };
 
   OrderEnd(two_pos, two_profit, two_loss, two_entry_price,
            two_ticket, two_check_history, two_close_conditions);

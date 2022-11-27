@@ -47,9 +47,10 @@ void OnTick(){
     ChangeEntryCondition(five_sell_conditions);
   };
 
-  OrderEntry(five_common_entry_conditions, five_open_conditions,
-             five_buy_conditions, five_sell_conditions, five_ticket,
-             five_lots, FIVE_MAGIC, five_pos, five_entry_price, five_entry_time);
+  if (BasicCondition(five_common_entry_conditions, five_open_conditions)){
+    OrderEntry(five_buy_conditions, five_sell_conditions, five_ticket,
+               five_lots, FIVE_MAGIC, five_pos, five_entry_price, five_entry_time);
+  };
 
   OrderEnd(five_pos, five_profit, five_loss, five_entry_price,
            five_ticket, five_check_history, five_close_conditions);

@@ -44,9 +44,10 @@ void OnTick(){
     ChangeEntryCondition(three_sell_conditions);
   };
 
-  OrderEntry(three_common_entry_conditions, three_open_conditions,
-             three_buy_conditions, three_sell_conditions, three_ticket,
-             three_lots, THREE_MAGIC, three_pos, three_entry_price, three_entry_time);
+  if (BasicCondition(three_common_entry_conditions, three_open_conditions)){
+    OrderEntry(three_buy_conditions, three_sell_conditions, three_ticket,
+               three_lots, THREE_MAGIC, three_pos, three_entry_price, three_entry_time);
+  };
 
   OrderEnd(three_pos, three_profit, three_loss, three_entry_price,
            three_ticket, three_check_history, three_close_conditions);

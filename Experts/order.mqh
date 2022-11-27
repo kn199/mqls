@@ -174,21 +174,23 @@ void ForcePriceStop(const int ag_pos)
     };
 };
 
-void OrderEntry(bool &ag_common_entry_conditions, bool &ag_this_ea_open_conditions,
-                bool &ag_buy_conditions, bool &ag_sell_conditions, int &ag_ticket,
+bool BasicCondition(bool &ag_common_entry_conditions, bool &ag_this_ea_open_conditions){
+  bool result = (ag_common_entry_conditions && ag_this_ea_open_conditions);
+  return(result);
+}
+
+void OrderEntry(bool &ag_buy_conditions, bool &ag_sell_conditions, int &ag_ticket,
                 double &ag_lots, const int ag_MAGIC, int &ag_pos,
                 double &ag_entry_price, datetime &ag_entry_time)
 {
-  if (ag_common_entry_conditions && ag_this_ea_open_conditions){
-    if (ag_buy_conditions) {
-       Entry(ag_ticket, OP_BUY, ag_lots, Ask, ag_MAGIC,
-             ag_pos, ag_entry_price, ag_entry_time);
-    };
+  if (ag_buy_conditions) {
+    Entry(ag_ticket, OP_BUY, ag_lots, Ask, ag_MAGIC,
+          ag_pos, ag_entry_price, ag_entry_time);
+  };
 
-    if (ag_sell_conditions) {
-       Entry(ag_ticket, OP_SELL, ag_lots, Bid, ag_MAGIC,
-             ag_pos, ag_entry_price, ag_entry_time);
-     };
+  if (ag_sell_conditions) {
+    Entry(ag_ticket, OP_SELL, ag_lots, Bid, ag_MAGIC,
+          ag_pos, ag_entry_price, ag_entry_time);
   };
 };
 
