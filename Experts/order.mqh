@@ -73,9 +73,9 @@ void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
                          slippage,
                          0,              //loss: no_set
                          0,              //profit: no_set
-                         WindowExpertName(),  //cooment
-                         ag_MAGIC,
-                         0,                   //expire: no_set
+                         ag_MAGIC,       //cooment
+                         ag_MAGIC,       //MAGIC
+                         0,              //expire: no_set
                          clrRed
                        );
 
@@ -89,7 +89,7 @@ void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
     ag_entry_price = OrderOpenPrice();
     ag_entry_time = TimeCurrent();
 
-    string open_email_subject = StringConcatenate(AccountCompany(), ",", WindowExpertName());
+    string open_email_subject = StringConcatenate(AccountCompany(), ",", WindowExpertName(), ",", ag_MAGIC);
     string open_email_text = StringConcatenate("entry", ",", DoubleToString(ag_entry_price, 3), ",",
                                                "ask_or_bid", DoubleToString(ag_ask_or_bid, 3));
     SendMail(open_email_subject, open_email_text);
