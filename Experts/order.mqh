@@ -14,8 +14,8 @@ bool IsCommonConditon(const int ag_pos, const datetime ag_entry_time, const int 
   return(result);
 };
 
-void AdjustLots(bool &ag_check_history, const int ag_continue_loss, const int ag_MAGIC,
-                double &ag_lots, const double ag_normal_lots, const double ag_min_lots)
+void AdjustLotsByResult(bool &ag_check_history, const int ag_continue_loss, const int ag_MAGIC,
+                        double &ag_lots, const double ag_normal_lots, const double ag_min_lots)
 {
   if (ag_check_history){
     bool is_normal_lots = true;
@@ -60,6 +60,17 @@ void AdjustLots(bool &ag_check_history, const int ag_continue_loss, const int ag
     ag_check_history = false;
   };
 };
+
+double AdjustLotsByLossPoint(const int ag_one_time_loss, const int ag_stop_point)
+{
+  double result = 0.01 * (ag_one_time_loss / ag_stop_point);
+  result = NormalizeDouble(result, 2);
+
+  if (result < 0.01){
+    result = 0.01;
+  }
+  return(result);
+}
 
 void MinLots(const bool min_lots_mode, double &lots) {
   if (min_lots_mode == true) {

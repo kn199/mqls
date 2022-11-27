@@ -59,6 +59,6 @@ void OnTick(){
   OrderEnd(a2_pos, a2_profit, a2_loss, a2_entry_price,
            a2_ticket, a2_check_history, a2_close_conditions);
 
-  AdjustLots(a2_check_history, a2_continue_loss, TWO_MAGIC,
-             a2_lots, a2_normal_lots, a2_min_lots);
+  AdjustLotsByResult(a2_check_history, a2_continue_loss, TWO_MAGIC,
+                     a2_lots, a2_normal_lots, a2_min_lots);
 }

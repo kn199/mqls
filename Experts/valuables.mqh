@@ -1,3 +1,6 @@
+// 以下は一回の負けの金額、これを元にロットが決まる
+input int one_time_loss = 10000; // ロット変更元になる一回の損失金額
+
 #define NO_POSITION 0
 #define BUY_POSITION 1
 #define SELL_POSITION -1

@@ -1,22 +1,23 @@
 #property strict
-#include "valuables.mqh"
+#include "proxy.mqh"
+
 #define ONE_MAGIC 1
 
 int a1_ticket = 0;
 int a1_pos = NO_POSITION;
 string a1_current = USDJPY;
 
-input int a1_min_lots_mode = true;  // ロット調整 0=通常, 1=0.01
-double a1_lots = 0.5;
-input double a1_normal_lots = 0.5;  // 通常ロット
-input double a1_min_lots = 0.1;     // 最小ロット
+input int a1_profit = 360;          // MA1:利益ポイント
+input int a1_loss = 150;            // MA1:損失ポイント
 
-input int a1_profit = 360;          // 利益ポイント
-input int a1_loss = 150;            // 損失ポイント
+input int a1_min_lots_mode = true;  // MA1:ロット調整 0=通常, 1=0.01
+double a1_lots = AdjustLotsByLossPoint(one_time_loss, a1_loss);
+double a1_normal_lots = a1_lots;
+input double a1_min_lots = 0.1;     // MA1:連続敗戦時の縮小ロット
 
-input int a1_continue_loss = 3;     // ロット減になる失敗連続回数
+input int a1_continue_loss = 3;     // MA1:ロット減になる失敗連続回数
 // commonは0で若干成績が違う(そのせいかわからない)
-input int a1_entry_interval = 1000000;    // オーダー間隔(秒)
+input int a1_entry_interval = 1000000;    // MA1:オーダー間隔(秒)
 // input int a1_entry_interval = 300;
 // input int a1_entry_start_hour = 13;
 // input int a1_entry_end_hour = 24;
