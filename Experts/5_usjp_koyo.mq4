@@ -3,58 +3,58 @@
 #include "5_usjp_koyo.mqh"
 
 void OnInit(){
-  EaStopCheck(five_current);
+  EaStopCheck(USDJPY);
   WeekStartEmail(email);
   day_start_hour = DayStartHourUpdate();
   // entry_start_hour = EntryStartUpdate(twelve);
   // entry_end_hour = EntryEndUpdate(twenty_four);
-  five_entry_hour = EntryHourUpdate(twenty_one);
-  five_entry_time = SetLastEntryTime(FIVE_MAGIC);
+  a5_entry_hour = EntryHourUpdate(twenty_one);
+  a5_entry_time = SetLastEntryTime(FIVE_MAGIC);
 
-  MinLots(five_min_lots_mode, five_lots);
+  MinLots(a5_min_lots_mode, a5_lots);
 };
 
 void OnTick(){
   if (IsDayStartTime()) {
-    EaStopCheck(five_current);
+    EaStopCheck(USDJPY);
     WeekStartEmail(email);
     day_start_hour = DayStartHourUpdate();
     // entry_start_hour = EntryStartUpdate(twelve);
     // entry_end_hour = EntryEndUpdate(twenty_four);
-    five_entry_hour = EntryHourUpdate(twenty_one);
-    five_entry_time = SetLastEntryTime(FIVE_MAGIC);
+    a5_entry_hour = EntryHourUpdate(twenty_one);
+    a5_entry_time = SetLastEntryTime(FIVE_MAGIC);
 
-    MinLots(five_min_lots_mode, five_lots);
+    MinLots(a5_min_lots_mode, a5_lots);
   };
 
-  if (IsCheckConditionTime(five_entry_hour, five_entry_minute)) {
-    five_common_entry_conditions =
-      IsCommonConditon(five_pos, five_entry_time, five_entry_interval);
-    five_open_conditions = (
-                                IsFirstWeek() &&
-                                LocalDayOfWeek() == FRIDAY &&
-                                LocalHour() == five_entry_hour &&
-                                LocalMinute() == five_entry_minute
-                              );
+  if (IsCheckConditionTime(a5_entry_hour, a5_entry_minute)) {
+    a5_common_entry_conditions =
+      IsCommonConditon(a5_pos, a5_entry_time, a5_entry_interval);
+    a5_open_conditions = (
+                            IsFirstWeek() &&
+                            LocalDayOfWeek() == FRIDAY &&
+                            LocalHour() == a5_entry_hour &&
+                            LocalMinute() == a5_entry_minute
+                          );
 
-    five_buy_conditions = IsUp(1, 1);
-    five_sell_conditions = IsDown(1, 1);
+    a5_buy_conditions = IsUp(1, 1);
+    a5_sell_conditions = IsDown(1, 1);
   };
 
 
-  if (IsEntryOneMinuteLater(five_entry_hour, five_entry_minute)){
-    ChangeEntryCondition(five_buy_conditions);
-    ChangeEntryCondition(five_sell_conditions);
+  if (IsEntryOneMinuteLater(a5_entry_hour, a5_entry_minute)){
+    ChangeEntryCondition(a5_buy_conditions);
+    ChangeEntryCondition(a5_sell_conditions);
   };
 
-  if (BasicCondition(five_common_entry_conditions, five_open_conditions)){
-    OrderEntry(five_buy_conditions, five_sell_conditions, five_ticket,
-               five_lots, FIVE_MAGIC, five_pos, five_entry_price, five_entry_time);
+  if (BasicCondition(a5_common_entry_conditions, a5_open_conditions)){
+    OrderEntry(a5_buy_conditions, a5_sell_conditions, a5_ticket,
+               a5_lots, FIVE_MAGIC, a5_pos, a5_entry_price, a5_entry_time);
   };
 
-  OrderEnd(five_pos, five_profit, five_loss, five_entry_price,
-           five_ticket, five_check_history, five_close_conditions);
+  OrderEnd(a5_pos, a5_profit, a5_loss, a5_entry_price,
+           a5_ticket, a5_check_history, a5_close_conditions);
 
-  AdjustLots(five_check_history, five_continue_loss, FIVE_MAGIC,
-             five_lots, five_normal_lots, five_min_lots);
+  AdjustLots(a5_check_history, a5_continue_loss, FIVE_MAGIC,
+             a5_lots, a5_normal_lots, a5_min_lots);
 };
