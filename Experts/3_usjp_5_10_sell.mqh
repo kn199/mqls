@@ -34,4 +34,39 @@ bool a3_sell_conditions = false;
 
 double a3_entry_price;
 datetime a3_entry_time;
-bool a3_check_history;
+
+void A3Init(){
+  // a3_entry_start_hour = EntryStartUpdate(twelve);
+  // a3_entry_end_hour = EntryEndUpdate(twenty_four);
+  // a3_entry_hour = EntryHourUpdate(entry_hour);
+  a3_entry_time = SetLastEntryTime(THREE_MAGIC);
+
+  a3_lots = AdjustLotsByResult(a3_continue_loss, THREE_MAGIC,
+                               a3_normal_lots, a3_min_lots);
+  MinLots(a3_min_lots_mode, a3_lots);
+}
+
+void A3Tick(){
+  if (IsCheckConditionTime(a3_entry_hour, a3_entry_minute)){
+    a3_common_entry_conditions =
+      IsCommonConditon(a3_pos, a3_entry_time, a3_entry_interval);
+    a3_sell_conditions = (
+                           IsWeekDay() &&
+                           IsGoToBi() &&
+                           LocalHour() == a3_entry_hour &&
+                           LocalMinute() == a3_entry_minute
+                         );
+  };
+
+  if (IsEntryOneMinuteLater(a3_entry_hour, a3_entry_minute)){
+    ChangeEntryCondition(a3_sell_conditions);
+  };
+
+  if (BasicCondition(a3_common_entry_conditions, a3_open_conditions)){
+    OrderEntry(a3_buy_conditions, a3_sell_conditions, a3_ticket,
+               a3_lots, THREE_MAGIC, a3_pos, a3_entry_price, a3_entry_time);
+  };
+
+  OrderEnd(a3_pos, a3_profit, a3_loss, a3_entry_price,
+           a3_ticket, a3_close_conditions);
+}
