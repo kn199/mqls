@@ -5,6 +5,8 @@
 void OnInit(){
   EaStopCheck(USDJPY);
   WeekStartEmail(email);
+  a5_lots = AdjustLotsByResult(a5_continue_loss, FIVE_MAGIC,
+                               a5_normal_lots, a5_min_lots);
   day_start_hour = DayStartHourUpdate();
   // entry_start_hour = EntryStartUpdate(twelve);
   // entry_end_hour = EntryEndUpdate(twenty_four);
@@ -18,9 +20,9 @@ void OnTick(){
   if (IsDayStartTime()) {
     EaStopCheck(USDJPY);
     WeekStartEmail(email);
+    a5_lots = AdjustLotsByResult(a5_continue_loss, FIVE_MAGIC,
+                                 a5_normal_lots, a5_min_lots);
     day_start_hour = DayStartHourUpdate();
-    // entry_start_hour = EntryStartUpdate(twelve);
-    // entry_end_hour = EntryEndUpdate(twenty_four);
     a5_entry_hour = EntryHourUpdate(twenty_one);
     a5_entry_time = SetLastEntryTime(FIVE_MAGIC);
 
@@ -53,8 +55,5 @@ void OnTick(){
   };
 
   OrderEnd(a5_pos, a5_profit, a5_loss, a5_entry_price,
-           a5_ticket, a5_check_history, a5_close_conditions);
-
-  AdjustLotsByResult(a5_check_history, a5_continue_loss, FIVE_MAGIC,
-                     a5_lots, a5_normal_lots, a5_min_lots);
+           a5_ticket, a5_close_conditions);
 };

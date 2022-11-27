@@ -15,6 +15,13 @@ void OnInit(){
   a3_entry_time = SetLastEntryTime(THREE_MAGIC);
   a5_entry_time = SetLastEntryTime(FIVE_MAGIC);
 
+  a2_lots = AdjustLotsByResult(a2_continue_loss, TWO_MAGIC,
+                               a2_normal_lots, a2_min_lots);
+  a3_lots = AdjustLotsByResult(a3_continue_loss, THREE_MAGIC,
+                               a3_normal_lots, a3_min_lots);
+  a5_lots = AdjustLotsByResult(a5_continue_loss, FIVE_MAGIC,
+                               a5_normal_lots, a5_min_lots);
+
   MinLots(a2_min_lots_mode, a2_lots);
   MinLots(a3_min_lots_mode, a3_lots);
   MinLots(a5_min_lots_mode, a5_lots);
@@ -31,6 +38,13 @@ void OnTick(){
     a2_entry_time = SetLastEntryTime(TWO_MAGIC);
     a3_entry_time = SetLastEntryTime(THREE_MAGIC);
     a5_entry_time = SetLastEntryTime(FIVE_MAGIC);
+
+    a2_lots = AdjustLotsByResult(a2_continue_loss, TWO_MAGIC,
+                                 a2_normal_lots, a2_min_lots);
+    a3_lots = AdjustLotsByResult(a3_continue_loss, THREE_MAGIC,
+                                 a3_normal_lots, a3_min_lots);
+    a5_lots = AdjustLotsByResult(a5_continue_loss, FIVE_MAGIC,
+                                 a5_normal_lots, a5_min_lots);
 
     MinLots(a2_min_lots_mode, a2_lots);
     MinLots(a3_min_lots_mode, a3_lots);
@@ -65,11 +79,7 @@ void OnTick(){
   };
 
   OrderEnd(a2_pos, a2_profit, a2_loss, a2_entry_price,
-           a2_ticket, a2_check_history, a2_close_conditions);
-
-  AdjustLotsByResult(a2_check_history, a2_continue_loss, TWO_MAGIC,
-                     a2_lots, a2_normal_lots, a2_min_lots);
-
+           a2_ticket, a2_close_conditions);
 
   if (IsCheckConditionTime(a3_entry_hour, a3_entry_minute)){
     a3_common_entry_conditions =
@@ -92,11 +102,7 @@ void OnTick(){
   };
 
   OrderEnd(a3_pos, a3_profit, a3_loss, a3_entry_price,
-           a3_ticket, a3_check_history, a3_close_conditions);
-
-  AdjustLotsByResult(a3_check_history, a3_continue_loss, THREE_MAGIC,
-                     a3_lots, a3_normal_lots, a3_min_lots);
-
+           a3_ticket, a3_close_conditions);
 
   if (IsCheckConditionTime(a5_entry_hour, a5_entry_minute)) {
     a5_common_entry_conditions =
@@ -123,8 +129,5 @@ void OnTick(){
   };
 
   OrderEnd(a5_pos, a5_profit, a5_loss, a5_entry_price,
-           a5_ticket, a5_check_history, a5_close_conditions);
-
-  AdjustLotsByResult(a5_check_history, a5_continue_loss, FIVE_MAGIC,
-                     a5_lots, a5_normal_lots, a5_min_lots);
+           a5_ticket, a5_close_conditions);
 };

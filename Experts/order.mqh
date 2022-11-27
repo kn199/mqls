@@ -14,51 +14,40 @@ bool IsCommonConditon(const int ag_pos, const datetime ag_entry_time, const int 
   return(result);
 };
 
-void AdjustLotsByResult(bool &ag_check_history, const int ag_continue_loss, const int ag_MAGIC,
-                        double &ag_lots, const double ag_normal_lots, const double ag_min_lots)
+double AdjustLotsByResult(const int ag_continue_loss, const int ag_MAGIC,
+                          const double ag_normal_lots, const double ag_min_lots)
 {
-  if (ag_check_history){
-    bool is_normal_lots = true;
-    int histroy_total = OrdersHistoryTotal();
+  double lots = ag_normal_lots;
 
-    if (ag_continue_loss <= histroy_total){
-      is_normal_lots = false;
-      int ellement = 0;
-      double trade_results[];
-      ArrayResize(trade_results, ag_continue_loss);
-      ArrayInitialize(trade_results, 0.0);
+  double trade_results[];
+  ArrayResize(trade_results, ag_continue_loss);
+  ArrayInitialize(trade_results, 0.0);
 
-      for (int i = histroy_total - 1; 0 <= i; i--){
-        if(ag_continue_loss - 1 < ellement){
-          break;
-        };
+  int count = 0;
+  int histroy_total = OrdersHistoryTotal();
 
-        bool result = OrderSelect(i,SELECT_BY_POS,MODE_HISTORY);
-        if(
-            OrderMagicNumber() == ag_MAGIC &&
-            OrderProfit() != 0
-          )
-          {
-            trade_results[ellement] = OrderProfit();
-            ellement++;
-          };
+  if (ag_continue_loss <= histroy_total){
+    for (int i = histroy_total - 1; 0 <= i; i--){
+      // 直近N回のデータがたまったので抜ける
+      if(ag_continue_loss <= count){
+        break;
       };
 
-      for (int number = 0; number <= ag_continue_loss - 1; number++){
-        if (0 < trade_results[number]){
-          is_normal_lots = true;
-        };
+      bool result = OrderSelect(i, SELECT_BY_POS, MODE_HISTORY);
+
+      if(OrderMagicNumber() == ag_MAGIC && OrderProfit() != 0){
+        trade_results[count] = OrderProfit();
+        count++;
       };
     };
 
-    if (is_normal_lots){
-      ag_lots = ag_normal_lots;
-    } else {
-      ag_lots = ag_min_lots;
+    int max_array_index = ArrayMaximum(trade_results, WHOLE_ARRAY, 0);
+    if (ag_continue_loss <= ArraySize(trade_results) && trade_results[max_array_index] < 0){
+      lots = ag_min_lots;
     };
-
-    ag_check_history = false;
   };
+
+  return(lots);
 };
 
 double AdjustLotsByLossPoint(const int ag_one_time_loss, const int ag_stop_point)
@@ -117,7 +106,7 @@ void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
 
 void OrderSettle(int &ag_pos, const int ag_profit, const int ag_loss,
                  const double ag_entry_price, const int ag_ticket,
-                 bool &ag_check_history, bool &ag_this_ea_close_conditions)
+                 bool &ag_this_ea_close_conditions)
 {
   bool conditions_buy = ag_pos == BUY_POSITION &&
                         (
@@ -152,7 +141,6 @@ void OrderSettle(int &ag_pos, const int ag_profit, const int ag_loss,
 
     if (result){
       ag_pos = NO_POSITION;
-      ag_check_history = true;
     } else {
       SendMail("クロースで本文のエラー発生", IntegerToString(GetLastError()));
     };
@@ -206,9 +194,9 @@ void OrderEntry(bool &ag_buy_conditions, bool &ag_sell_conditions, int &ag_ticke
 };
 
 void OrderEnd(int &ag_pos, const int ag_profit, const int ag_loss, double &ag_entry_price,
-              int &ag_ticket, bool &ag_check_history, bool &ag_this_ea_close_conditions)
+              int &ag_ticket, bool &ag_close_conditions)
 {
-  OrderSettle(ag_pos, ag_profit, ag_loss, ag_entry_price, ag_ticket,
-              ag_check_history, ag_this_ea_close_conditions);
+  OrderSettle(ag_pos, ag_profit, ag_loss, ag_entry_price,
+              ag_ticket, ag_close_conditions);
   ForcePriceStop(ag_pos);
 };
