@@ -61,6 +61,12 @@ void AdjustLots(bool &ag_check_history, const int ag_continue_loss, const int ag
   };
 };
 
+void MinLots(const bool min_lots_mode, double &lots) {
+  if (min_lots_mode == true) {
+    lots = 0.01;
+  };
+}
+
 void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
            const double ag_ask_or_bid, const int ag_MAGIC, int &ag_pos,
            double &ag_entry_price, datetime &ag_entry_time)
@@ -73,7 +79,7 @@ void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
                          slippage,
                          0,              //loss: no_set
                          0,              //profit: no_set
-                         ag_MAGIC,       //cooment
+                         ag_MAGIC,       //cooment, MAGICでないとわかりにくい
                          ag_MAGIC,       //MAGIC
                          0,              //expire: no_set
                          clrRed

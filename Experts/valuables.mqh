@@ -20,22 +20,15 @@
 #define UP 1
 #define DOWN 2
 
-input double force_stop_price = -1000000.0;
-input double min_account_money = 1000.0;
+input double force_stop_price = -1000000.0;  // 強制決済損益
+input double min_account_money = 1000.0;     // 稼働停止証拠金
 
-input int slippage = 3;
+input int slippage = 3; // 許容スリップ、1＝0.001円
 int day;
 
-int ticket = 0;
-int pos = NO_POSITION;
-double entry_price;
-bool common_entry_conditions = false;
-bool buy_conditions = false;
-bool sell_conditions = false;
 bool is_summer;
-datetime entry_time;
 bool email;
-bool check_history = true;
+
 int day_start_hour = SUMMER_DAY_START_HOUR;
 
 double four_hour_highs[];
@@ -50,11 +43,11 @@ double week_closes[];
 
 // timeframe_array[time_input]とかをコード上に仕組んで、時間足で遺伝的アルゴリズムを検証する
 int timeframe_array[10] = {0,1,5,15,30,60,240,1440,10080,43200};
-input int time_input = 0;
+input int time_input = 0; // 複数時間で一度のテスト用
 
 // current_array[current_input]とかをコード上に仕組んで、通貨で遺伝的アルゴリズムを検証する
 string current_array[3] = {USDJPY,EURUSD,EURJPY};
-input int current_input = 0;
+input int current_input = 0; // 複数通貨で一度のテスト用
 
 // 引数用に設定、定数だとエラーになるので変数
 int zero = 0;
@@ -82,4 +75,3 @@ int twenty_one = 21;
 int twenty_two = 22;
 int twenty_three = 23;
 int twenty_four = 24;
-
