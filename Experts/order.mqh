@@ -5,9 +5,11 @@
 
 bool IsCommonConditon(const int ag_pos, const datetime ag_entry_time, const int ag_entry_interval)
 {
+  // 時間差を秒数に変換
+  int time_diff = (TimeCurrent() - ag_entry_time);
   bool result = (
                   ag_pos == NO_POSITION &&
-                  TimeCurrent() - ag_entry_time > ag_entry_interval &&
+                  time_diff > ag_entry_interval &&
                   AccountEquity() > min_account_money &&
                   IsWeekDay()
                 );
@@ -93,6 +95,7 @@ void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
     };
     OrderSelect(ag_ticket, SELECT_BY_TICKET);
     ag_entry_price = OrderOpenPrice();
+    // server time OrderOpenTimeがサーバライム
     ag_entry_time = TimeCurrent();
 
     string open_email_subject = StringConcatenate(AccountCompany(), ",", WindowExpertName(), ",", ag_MAGIC);
@@ -180,17 +183,31 @@ bool BasicCondition(bool &ag_common_entry_conditions, bool &ag_this_ea_open_cond
 
 void OrderEntry(bool &ag_buy_conditions, bool &ag_sell_conditions, int &ag_ticket,
                 double &ag_lots, const int ag_MAGIC, int &ag_pos,
-                double &ag_entry_price, datetime &ag_entry_time)
+                double &ag_entry_price, datetime &ag_entry_time, const int ag_entry_interval)
 {
+  bool result;
+  if (ag_buy_conditions || ag_sell_conditions){
+    result = IsOkContinuos(ag_MAGIC, ag_entry_interval);
+  };
+
   if (ag_buy_conditions) {
-    Entry(ag_ticket, OP_BUY, ag_lots, Ask, ag_MAGIC,
-          ag_pos, ag_entry_price, ag_entry_time);
+    if (result) {
+      Entry(ag_ticket, OP_BUY, ag_lots, Ask, ag_MAGIC,
+            ag_pos, ag_entry_price, ag_entry_time);
+    };
   };
 
   if (ag_sell_conditions) {
-    Entry(ag_ticket, OP_SELL, ag_lots, Bid, ag_MAGIC,
-          ag_pos, ag_entry_price, ag_entry_time);
+    if (result) {
+      Entry(ag_ticket, OP_SELL, ag_lots, Bid, ag_MAGIC,
+            ag_pos, ag_entry_price, ag_entry_time);
+    };
   };
+};
+
+bool HavePosition(const int ag_pos){
+  bool result = (ag_pos != NO_POSITION);
+  return(result);
 };
 
 void OrderEnd(int &ag_pos, const int ag_profit, const int ag_loss, double &ag_entry_price,
@@ -200,3 +217,10 @@ void OrderEnd(int &ag_pos, const int ag_profit, const int ag_loss, double &ag_en
               ag_ticket, ag_close_conditions);
   ForcePriceStop(ag_pos);
 };
+
+// entry_intervalが短い(特に360以下)と注文ループの恐れ、initで使用
+void PreventContinueusOrder(int entry_interval) {
+  if (entry_interval < 450){
+    EaStop("注文ループの恐れによりEAを停止しました。");  
+  };
+}

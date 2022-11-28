@@ -15,9 +15,10 @@ double a3_normal_lots = a3_lots;
 input double a3_min_lots = 0.1;     // MA3:連続敗戦時の縮小ロット
 
 input int a3_continue_loss = 3;     // MA5:ロット減になる失敗連続回数
-// commonは0で若干成績が違う(そのせいかわからない)
-input int a3_entry_interval = 300;    // MA5:オーダー間隔(秒)
-// input int a3_entry_interval = 300;
+
+// !!!!!!!! entry_interval 500以上に
+input int a3_entry_interval = 500;    // MA5:オーダー間隔(秒)
+
 // input int a3_entry_start_hour = 13;
 // input int a3_entry_end_hour = 24;
 int a3_entry_start_hour = zero;

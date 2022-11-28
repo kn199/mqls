@@ -179,9 +179,9 @@ int EntryEndUpdate(const int number)
 {
   int hour;
   if (IsSummerTime()){
-      hour = number;
+    hour = number;
   } else {
-      hour = number + 1;
+    hour = number + 1;
   };
 
   return(hour);
@@ -212,9 +212,14 @@ void EntryHourUpdateOverDay(int &ag_entry_hour, int ag_summer_entry_hour,
   };
 };
 
-datetime SetLastEntryTime(const int ag_MAGIC)
+datetime GetLastEntryTime(const int ag_MAGIC)
 {
   datetime entry_time;
+
+  // 決済済みの注文、無限ループの取引中注文
+  datetime history_order_time;
+  datetime entrying_order_time;
+
   int array[2] = {100, 0};
   // なぜか上で直接OrdersHistoryTotal()を代入できない。
   array[1] = OrdersHistoryTotal();
@@ -223,19 +228,59 @@ datetime SetLastEntryTime(const int ag_MAGIC)
   // OrderSelectの第一引数が大きいほど最近だろうから降順でループ
   for (int i = loop_count; 0 <= i; i--){
     if (OrderSelect(i, SELECT_BY_POS, MODE_HISTORY) && OrderMagicNumber() == ag_MAGIC){
-      entry_time = OrderOpenTime();
-      if(entry_time != NULL) {
+      history_order_time = OrderOpenTime();
+      if(history_order_time != NULL) {
         break;
       };
     };
   };
   
+  for (int n = 10; 0 <= n; n--){
+    if (OrderSelect(n, SELECT_BY_POS, MODE_TRADES) && OrderMagicNumber() == ag_MAGIC){
+      entrying_order_time = OrderOpenTime();
+      if(entrying_order_time != NULL) {
+        break;
+      };
+    };
+  };
+
   // 前回エントリが直近でないので、intervalの制限にひっかからないような時間を設定 nullはNG
-  if (entry_time == NULL){
-    entry_time = D'1980.07.19 12:30:27';
+  if (history_order_time == NULL){
+    history_order_time = D'2000.07.19 12:30:27';
+  };
+
+  if (entrying_order_time == NULL){
+    entrying_order_time = D'1990.07.19 12:30:27';
+  };
+
+  // 新しいdatetimeが<で大きい方となる
+  if (history_order_time < entrying_order_time) {
+    entry_time = entrying_order_time;
+  } else {
+    entry_time = history_order_time;
   };
 
   return(entry_time);
+};
+
+bool IsOkContinuos(const int ag_MAGIC, const int ag_entry_interval){
+  bool result = false;
+  datetime last_entry_time = GetLastEntryTime(ag_MAGIC);
+  int diff = (TimeCurrent() - last_entry_time);
+
+  int interval;
+  // 1日：86400秒
+  if (ag_entry_interval < 1000000) {
+    interval = 1000000;
+  } else {
+    interval = ag_entry_interval;
+  }
+
+  if (interval < diff){
+    result = true;
+  };
+
+  return(result);
 };
 
 // 1w:10080, 4h:240, 1h: 60

@@ -1,5 +1,7 @@
 // 以下は一回の負けの金額、これを元にロットが決まる
 input int one_time_loss = 10000; // ロット変更元になる一回の損失金額
+int force_stop_price = -(one_time_loss * 2);  // 強制決済損益
+input int min_account_money = 1000;           // 稼働停止証拠金
 
 #define NO_POSITION 0
 #define BUY_POSITION 1
@@ -22,9 +24,6 @@ input int one_time_loss = 10000; // ロット変更元になる一回の損失�
 
 #define UP 1
 #define DOWN 2
-
-input double force_stop_price = -1000000.0;  // 強制決済損益
-input double min_account_money = 1000.0;     // 稼働停止証拠金
 
 input int slippage = 3; // 許容スリップ、1＝0.001円
 int day;

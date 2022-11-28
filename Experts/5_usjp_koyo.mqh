@@ -15,9 +15,9 @@ input double a5_min_lots = 0.1;     // MA5:連続敗戦時の縮小ロット
 double a5_lots = a5_normal_lots;
 
 input int a5_continue_loss = 3;     // MA5:ロット減になる失敗連続回数
-// commonは0で若干成績が違う(そのせいかわからない)
-input int a5_entry_interval = 216000; // MA5:オーダー間隔(秒)
-// input int a5_entry_interval = 300;
+
+// !!!!!!!! entry_interval 100000以上に
+input int a5_entry_interval = 100000; // MA5:オーダー間隔(秒)
 // input int a5_entry_start_hour = 13;
 // input int a5_entry_end_hour = 24;
 int a5_entry_start_hour = zero;
@@ -68,7 +68,7 @@ void A5Tick(){
 
   if (BasicCondition(a5_common_entry_conditions, a5_open_conditions)){
     OrderEntry(a5_buy_conditions, a5_sell_conditions, a5_ticket,
-               a5_lots, FIVE_MAGIC, a5_pos, a5_entry_price, a5_entry_time);
+              a5_lots, FIVE_MAGIC, a5_pos, a5_entry_price, a5_entry_time);
   };
 
   OrderEnd(a5_pos, a5_profit, a5_loss, a5_entry_price,
