@@ -10,7 +10,7 @@ input int a8_profit = 300;          // MA8:利益ポイント
 input int a8_loss = 120;            // MA8:損失ポイント
 
 input int a8_min_lots_mode = true;  // MA8:ロット調整 0=通常, 1=0.01
-double a8_normal_lots = AdjustLotsByLossPoint(one_time_loss, a8_loss);
+double a8_normal_lots = AdjustLotsByLossPoint(a8_loss);
 input double a8_min_lots = 0.1;     // MA8:連続敗戦時の縮小ロット
 double a8_lots = a8_normal_lots;
 
@@ -18,8 +18,6 @@ input int a8_continue_loss = 3;     // MA8:ロット減になる失敗連続回�
 
 // !!!!!!!! entry_interval 100000以上に
 input int a8_entry_interval = 100000; // MA8:オーダー間隔(秒)
-// input int a8_entry_start_hour = 13;
-// input int a8_entry_end_hour = 24;
 int a8_entry_start_hour = ten;
 int a8_entry_end_hour = twenty_two;
 
@@ -44,8 +42,15 @@ double MA2_4h;
 void A8Init(){
   a8_entry_start_hour = EntryStartUpdate(twelve);
   a8_entry_end_hour = EntryEndUpdate(twenty_four);
-  // entry_hour = EntryHourUpdate(zero);
   a8_entry_time = GetLastEntryTime(EIGHT_MAGIC);
+
+  a8_lots = AdjustLotsByResult(a8_continue_loss, EIGHT_MAGIC,
+                               a8_normal_lots, a8_min_lots);
+  if (a8_min_lots_mode) {
+    a8_lots = MinLots();
+  };
+
+  NoticeLots(a8_lots, EIGHT_MAGIC);
 };
 
 void A8Tick(){

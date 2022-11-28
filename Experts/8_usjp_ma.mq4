@@ -6,6 +6,7 @@ void OnInit(){
   EaStopCheck(USDJPY);
   WeekStartEmail(email);
   day_start_hour = DayStartHourUpdate();
+
   A8Init();
 };
 

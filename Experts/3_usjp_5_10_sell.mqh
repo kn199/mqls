@@ -10,14 +10,14 @@ input int a3_profit = 200;          // MA3:利益ポイント
 input int a3_loss = 120;            // MA3:損失ポイント
 
 input int a3_min_lots_mode = true;  // MA3:ロット調整 0=通常, 1=0.01
-double a3_lots = AdjustLotsByLossPoint(one_time_loss, a3_loss);
+double a3_lots = AdjustLotsByLossPoint(a3_loss);
 double a3_normal_lots = a3_lots;
 input double a3_min_lots = 0.1;     // MA3:連続敗戦時の縮小ロット
 
-input int a3_continue_loss = 3;     // MA5:ロット減になる失敗連続回数
+input int a3_continue_loss = 3;     // MA3:ロット減になる失敗連続回数
 
-// !!!!!!!! entry_interval 500以上に
-input int a3_entry_interval = 500;    // MA5:オーダー間隔(秒)
+// !!!!!!!! entry_interval 100000以上に
+input int a3_entry_interval = 100000;    // MA3:オーダー間隔(秒)
 
 // input int a3_entry_start_hour = 13;
 // input int a3_entry_end_hour = 24;
@@ -37,14 +37,15 @@ double a3_entry_price;
 datetime a3_entry_time;
 
 void A3Init(){
-  // a3_entry_start_hour = EntryStartUpdate(twelve);
-  // a3_entry_end_hour = EntryEndUpdate(twenty_four);
-  // a3_entry_hour = EntryHourUpdate(entry_hour);
-  a3_entry_time = SetLastEntryTime(THREE_MAGIC);
+  a3_entry_time = GetLastEntryTime(THREE_MAGIC);
 
   a3_lots = AdjustLotsByResult(a3_continue_loss, THREE_MAGIC,
                                a3_normal_lots, a3_min_lots);
-  MinLots(a3_min_lots_mode, a3_lots);
+  if (a3_min_lots_mode) {
+    a3_lots = MinLots();
+  };
+
+  NoticeLots(a3_lots, THREE_MAGIC);
 }
 
 void A3Tick(){
@@ -64,8 +65,8 @@ void A3Tick(){
   };
 
   if (BasicCondition(a3_common_entry_conditions, a3_open_conditions)){
-    OrderEntry(a3_buy_conditions, a3_sell_conditions, a3_ticket,
-               a3_lots, THREE_MAGIC, a3_pos, a3_entry_price, a3_entry_time);
+    OrderEntry(a3_buy_conditions, a3_sell_conditions, a3_ticket, a3_lots,
+               THREE_MAGIC, a3_pos, a3_entry_price, a3_entry_time, a3_entry_interval);
   };
 
   OrderEnd(a3_pos, a3_profit, a3_loss, a3_entry_price,

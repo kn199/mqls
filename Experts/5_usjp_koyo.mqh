@@ -10,7 +10,7 @@ input int a5_profit = 75;          // MA5:利益ポイント
 input int a5_loss = 70;            // MA5:損失ポイント
 
 input int a5_min_lots_mode = true;  // MA5:ロット調整 0=通常, 1=0.01
-double a5_normal_lots = AdjustLotsByLossPoint(one_time_loss, a5_loss);
+double a5_normal_lots = AdjustLotsByLossPoint(a5_loss);
 input double a5_min_lots = 0.1;     // MA5:連続敗戦時の縮小ロット
 double a5_lots = a5_normal_lots;
 
@@ -18,8 +18,6 @@ input int a5_continue_loss = 3;     // MA5:ロット減になる失敗連続回�
 
 // !!!!!!!! entry_interval 100000以上に
 input int a5_entry_interval = 100000; // MA5:オーダー間隔(秒)
-// input int a5_entry_start_hour = 13;
-// input int a5_entry_end_hour = 24;
 int a5_entry_start_hour = zero;
 int a5_entry_end_hour = twenty_four;
 
@@ -36,14 +34,16 @@ double a5_entry_price;
 datetime a5_entry_time;
 
 void A5Init(){
-  // entry_start_hour = EntryStartUpdate(twelve);
-  // entry_end_hour = EntryEndUpdate(twenty_four);
   a5_entry_hour = EntryHourUpdate(twenty_one);
-  a5_entry_time = SetLastEntryTime(FIVE_MAGIC);
+  a5_entry_time = GetLastEntryTime(FIVE_MAGIC);
 
   a5_lots = AdjustLotsByResult(a5_continue_loss, FIVE_MAGIC,
                                a5_normal_lots, a5_min_lots);
-  MinLots(a5_min_lots_mode, a5_lots);
+  if (a5_min_lots_mode) {
+    a5_lots = MinLots();
+  };
+
+  NoticeLots(a5_lots, FIVE_MAGIC);
 }
 
 void A5Tick(){
@@ -67,8 +67,8 @@ void A5Tick(){
   };
 
   if (BasicCondition(a5_common_entry_conditions, a5_open_conditions)){
-    OrderEntry(a5_buy_conditions, a5_sell_conditions, a5_ticket,
-              a5_lots, FIVE_MAGIC, a5_pos, a5_entry_price, a5_entry_time);
+    OrderEntry(a5_buy_conditions, a5_sell_conditions, a5_ticket, a5_lots,
+               FIVE_MAGIC, a5_pos, a5_entry_price, a5_entry_time, a5_entry_interval);
   };
 
   OrderEnd(a5_pos, a5_profit, a5_loss, a5_entry_price,

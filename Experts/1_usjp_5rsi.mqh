@@ -11,19 +11,15 @@ input int a1_profit = 360;          // MA1:利益ポイント
 input int a1_loss = 150;            // MA1:損失ポイント
 
 input int a1_min_lots_mode = true;  // MA1:ロット調整 0=通常, 1=0.01
-double a1_lots = AdjustLotsByLossPoint(one_time_loss, a1_loss);
+double a1_lots = AdjustLotsByLossPoint(a1_loss);
 double a1_normal_lots = a1_lots;
 input double a1_min_lots = 0.1;     // MA1:連続敗戦時の縮小ロット
 
 input int a1_continue_loss = 3;     // MA1:ロット減になる失敗連続回数
-// commonは0で若干成績が違う(そのせいかわからない)
 
-// !!!!!!!! entry_interval 500以上に
-// input int a1_entry_interval = 500;    // MA1:オーダー間隔(秒)
+// !!!!!!!! entry_interval 100000以上に
 input int a1_entry_interval = 1000000;    // MA1:オーダー間隔(秒)
 
-// input int a1_entry_start_hour = 13;
-// input int a1_entry_end_hour = 24;
 int a1_entry_start_hour = twelve;
 int a1_entry_end_hour = twenty_four;
 
@@ -54,24 +50,18 @@ double rsi_short_4;
 void A1Init(){
   a1_entry_start_hour = EntryStartUpdate(twelve);
   a1_entry_end_hour = EntryEndUpdate(twenty_four);
-  // a1_entry_hour = EntryHourUpdate(zero);
-  a1_entry_time = SetLastEntryTime(ONE_MAGIC);
+  a1_entry_time = GetLastEntryTime(ONE_MAGIC);
 
   a1_lots = AdjustLotsByResult(a1_continue_loss, ONE_MAGIC,
                                a1_normal_lots, a1_min_lots);
-  MinLots(a1_min_lots_mode, a1_lots);
+  if (a1_min_lots_mode) {
+    a1_lots = MinLots();
+  };
+
+  NoticeLots(a1_lots, ONE_MAGIC);
 }
 
 void A1Tick(){
-  if (IsDayStartTime()) {
-    a1_entry_start_hour = EntryStartUpdate(thirteen);
-    a1_entry_end_hour = EntryEndUpdate(twenty_four);
-    // a1_entry_hour = EntryHourUpdate(zero);
-    a1_entry_time = SetLastEntryTime(ONE_MAGIC);
-
-    MinLots(a1_min_lots_mode, a1_lots);
-  };
- 
   a1_common_entry_conditions =
     IsCommonConditon(a1_pos, a1_entry_time, a1_entry_interval);
 
@@ -110,8 +100,8 @@ void A1Tick(){
   );
 
   if (BasicCondition(a1_common_entry_conditions, a1_open_conditions)){
-    OrderEntry(a1_buy_conditions, a1_sell_conditions, a1_ticket,
-               a1_lots, ONE_MAGIC, a1_pos, a1_entry_price, a1_entry_time);
+    OrderEntry(a1_buy_conditions, a1_sell_conditions, a1_ticket, a1_lots,
+               ONE_MAGIC, a1_pos, a1_entry_price, a1_entry_time, a1_entry_interval);
   };
 
   OrderEnd(a1_pos, a1_profit, a1_loss, a1_entry_price,

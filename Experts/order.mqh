@@ -52,21 +52,19 @@ double AdjustLotsByResult(const int ag_continue_loss, const int ag_MAGIC,
   return(lots);
 };
 
-double AdjustLotsByLossPoint(const int ag_one_time_loss, const int ag_stop_point)
+double AdjustLotsByLossPoint(const int ag_stop_point)
 {
-  double result = 0.01 * (ag_one_time_loss / ag_stop_point);
-  result = NormalizeDouble(result, 2);
+  double result = 0.01 * (one_time_loss / ag_stop_point);
+  result = NormalizeDouble(result, 1);
 
-  if (result < 0.01){
-    result = 0.01;
+  if (result < 0.1){
+    result = 0.1;
   }
   return(result);
 }
 
-void MinLots(const bool min_lots_mode, double &lots) {
-  if (min_lots_mode == true) {
-    lots = 0.01;
-  };
+double MinLots() {
+  return(0.01);
 }
 
 void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
@@ -220,7 +218,7 @@ void OrderEnd(int &ag_pos, const int ag_profit, const int ag_loss, double &ag_en
 
 // entry_intervalが短い(特に360以下)と注文ループの恐れ、initで使用
 void PreventContinueusOrder(int entry_interval) {
-  if (entry_interval < 450){
+  if (entry_interval < 100000){
     EaStop("注文ループの恐れによりEAを停止しました。");  
   };
 }
