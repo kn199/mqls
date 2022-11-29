@@ -83,6 +83,6 @@ void NoticeLots(const double ag_lots, const int ag_MA) {
     "ロット ", ag_lots, ", MA ", ag_MA, "会社 ", AccountCompany()
   );
 
-  Print("ロット情報", describe);
-  SendMail("ロットの連絡", describe);
+  // Print("ロット情報", describe);
+  // SendMail("ロットの連絡", describe);
 };

@@ -17,7 +17,7 @@ double a8_lots = a8_normal_lots;
 input int a8_continue_loss = 3;     // MA8:ロット減になる失敗連続回数
 
 // !!!!!!!! entry_interval 100000以上に
-input int a8_entry_interval = 100000; // MA8:オーダー間隔(秒)
+int a8_entry_interval = minimum_entry_interval; // MA8:オーダー間隔(秒)
 int a8_entry_start_hour = ten;
 int a8_entry_end_hour = twenty_two;
 

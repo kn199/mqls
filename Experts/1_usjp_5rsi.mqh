@@ -18,7 +18,7 @@ input double a1_min_lots = 0.1;     // MA1:連続敗戦時の縮小ロット
 input int a1_continue_loss = 3;     // MA1:ロット減になる失敗連続回数
 
 // !!!!!!!! entry_interval 100000以上に
-input int a1_entry_interval = 1000000;    // MA1:オーダー間隔(秒)
+input int a1_entry_interval = 100000;    // MA1:オーダー間隔(秒)
 
 int a1_entry_start_hour = twelve;
 int a1_entry_end_hour = twenty_four;

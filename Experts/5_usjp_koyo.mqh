@@ -16,10 +16,7 @@ double a5_lots = a5_normal_lots;
 
 input int a5_continue_loss = 3;     // MA5:ロット減になる失敗連続回数
 
-// !!!!!!!! entry_interval 100000以上に
-input int a5_entry_interval = 100000; // MA5:オーダー間隔(秒)
-int a5_entry_start_hour = zero;
-int a5_entry_end_hour = twenty_four;
+int a5_entry_interval = minimum_entry_interval; // MA5:オーダー間隔(秒)
 
 int a5_entry_hour = twenty_one;
 int a5_entry_minute = 31;

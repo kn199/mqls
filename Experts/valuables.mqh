@@ -1,7 +1,10 @@
 // 以下は一回の負けの金額、これを元にロットが決まる
-input int one_time_loss = 10000; // ロット変更元になる一回の損失金額
+input int one_time_loss = 2000; // ロット変更元になる一回の損失金額
 int force_stop_price = -(one_time_loss * 2);  // 強制決済損益
 input int min_account_money = 1000;           // 稼働停止証拠金
+
+// 1日：86400秒
+int minimum_entry_interval = 100000;
 
 #define NO_POSITION 0
 #define BUY_POSITION 1
@@ -44,12 +47,12 @@ double week_opens[];
 double week_closes[];
 
 // timeframe_array[time_input]とかをコード上に仕組んで、時間足で遺伝的アルゴリズムを検証する
-int timeframe_array[10] = {0,1,5,15,30,60,240,1440,10080,43200};
-input int time_input = 0; // 複数時間で一度のテスト用
+// int timeframe_array[10] = {0,1,5,15,30,60,240,1440,10080,43200};
+// input int time_input = 0; // 複数時間で一度のテスト用
 
 // current_array[current_input]とかをコード上に仕組んで、通貨で遺伝的アルゴリズムを検証する
-string current_array[3] = {USDJPY,EURUSD,EURJPY};
-input int current_input = 0; // 複数通貨で一度のテスト用
+// string current_array[3] = {USDJPY,EURUSD,EURJPY};
+// input int current_input = 0; // 複数通貨で一度のテスト用
 
 // 引数用に設定、定数だとエラーになるので変数
 int zero = 0;

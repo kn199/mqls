@@ -17,9 +17,7 @@ double a2_min_lots = 0.1;     // MA2:連続敗戦時の縮小ロット
 input int a2_continue_loss = 3;     // MA2:ロット減になる失敗連続回数
 
 // !!!!!!!! entry_interval 100000以上に
-input int a2_entry_interval = 100000;    // MA2:オーダー間隔(秒)
-// input int one_entry_start_hour = 13;
-// input int one_entry_end_hour = 24;
+int a2_entry_interval = minimum_entry_interval;    // MA2:オーダー間隔(秒)
 int a2_entry_start_hour = zero;
 int a2_entry_end_hour = twenty_four;
 
@@ -65,8 +63,7 @@ void A2Tick(){
   a2_close_conditions = (
                           LocalHour() == a2_close_hour &&
                           LocalMinute() == a2_close_minutes &&
-                          a2_pos != 0 &&
-                          IsSummerTime()
+                          a2_pos != 0
                         );
 
   if (IsEntryOneMinuteLater(a2_entry_hour, a2_entry_minute)){

@@ -4,6 +4,7 @@
 #include "2_usjp_5_10_buy.mqh"
 #include "3_usjp_5_10_sell.mqh"
 #include "5_usjp_koyo.mqh"
+#include "8_usjp_ma.mqh"
 
 void OnInit(){
   EaStopCheck(USDJPY);
@@ -14,6 +15,7 @@ void OnInit(){
   A2Init();
   A3Init();
   A5Init();
+  A8Init();
 };
 
 void OnTick(){
@@ -26,10 +28,12 @@ void OnTick(){
     A2Init();
     A3Init();
     A5Init();
+    A8Init();
   };
 
   A1Tick();
   A2Tick();
   A3Tick();
   A5Tick();
+  A8Tick();
 };

@@ -17,10 +17,8 @@ input double a3_min_lots = 0.1;     // MA3:連続敗戦時の縮小ロット
 input int a3_continue_loss = 3;     // MA3:ロット減になる失敗連続回数
 
 // !!!!!!!! entry_interval 100000以上に
-input int a3_entry_interval = 100000;    // MA3:オーダー間隔(秒)
+int a3_entry_interval = minimum_entry_interval;    // MA3:オーダー間隔(秒)
 
-// input int a3_entry_start_hour = 13;
-// input int a3_entry_end_hour = 24;
 int a3_entry_start_hour = zero;
 int a3_entry_end_hour = twenty_four;
 

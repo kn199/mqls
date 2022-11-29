@@ -269,9 +269,8 @@ bool IsOkContinuos(const int ag_MAGIC, const int ag_entry_interval){
   int diff = (TimeCurrent() - last_entry_time);
 
   int interval;
-  // 1日：86400秒
-  if (ag_entry_interval < 1000000) {
-    interval = 1000000;
+  if (ag_entry_interval < minimum_entry_interval) {
+    interval = minimum_entry_interval;
   } else {
     interval = ag_entry_interval;
   }
