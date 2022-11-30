@@ -12,7 +12,7 @@ input int a2_loss = 160;            // MA2:損失ポイント
 input int a2_min_lots_mode = true;  // MA2:ロット調整 0=通常, 1=0.01
 double a2_normal_lots = AdjustLotsByLossPoint(a2_loss);
 double a2_lots = a2_normal_lots;
-double a2_min_lots = 0.1;     // MA2:連続敗戦時の縮小ロット
+double a2_min_lots = min_lots;     // MA2:連続敗戦時の縮小ロット
 
 input int a2_continue_loss = 3;     // MA2:ロット減になる失敗連続回数
 

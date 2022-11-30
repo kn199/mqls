@@ -11,7 +11,7 @@ input int a8_loss = 120;            // MA8:損失ポイント
 
 input int a8_min_lots_mode = true;  // MA8:ロット調整 0=通常, 1=0.01
 double a8_normal_lots = AdjustLotsByLossPoint(a8_loss);
-input double a8_min_lots = 0.1;     // MA8:連続敗戦時の縮小ロット
+input double a8_min_lots = min_lots;     // MA8:連続敗戦時の縮小ロット
 double a8_lots = a8_normal_lots;
 
 input int a8_continue_loss = 3;     // MA8:ロット減になる失敗連続回数

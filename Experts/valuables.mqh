@@ -2,6 +2,7 @@
 input int one_time_loss = 2000; // ロット変更元になる一回の損失金額
 int force_stop_price = -(one_time_loss * 2);  // 強制決済損益
 input int min_account_money = 1000;           // 稼働停止証拠金
+double min_lots = 0.01;  // 設定最小ロット、証券会社により違う
 
 // 1日：86400秒
 int minimum_entry_interval = 100000;

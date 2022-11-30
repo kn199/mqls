@@ -54,17 +54,17 @@ double AdjustLotsByResult(const int ag_continue_loss, const int ag_MAGIC,
 
 double AdjustLotsByLossPoint(const int ag_stop_point)
 {
-  double result = 0.01 * (one_time_loss / ag_stop_point);
+  double result = min_lots * (one_time_loss / ag_stop_point);
   result = NormalizeDouble(result, 1);
 
-  if (result < 0.1){
-    result = 0.1;
+  if (result < min_lots1){
+    result = min_lots;
   }
   return(result);
 }
 
 double MinLots() {
-  return(0.01);
+  return(min_lots);
 }
 
 void Entry(int &ag_ticket, const int ag_opbuy_or_opsell, const double ag_lots,
