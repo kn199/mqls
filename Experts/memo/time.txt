@@ -1,0 +1,27 @@
+■KAGOYA + LAND
+月曜日の8:32 → DayOfWeek 0, Hour 23, Minute 32
+
+■KAGOYA + Gemforex
+月曜日の9:13 → DayOfWeek 1, Hour 3, Minute 13
+
+■time系の関数
+https://yukifx.web.fc2.com/sub/reference/10_dateandtime/cone/datetimefunc_timelocal.html
+
+テストする際に、時間は過去のデータに応じてシミュレータされます。
+
+PCのローカル時刻を取得するTimeLocal()関数、
+取引サーバーの設定されたタイムゾーンの時刻を取得するTimeCurrent()関数
+取引サーバーの時刻をGMT時間で取得するTimeGMT()関数、
+これらの関数は、テスト中には同じ時間になります。
+
+テスター内ではローカル時刻・サーバー時刻・GMT時刻に差はありません。
+テスターはサーバーへの接続が失われたケースを意図的に提供しています。
+
+サーバーとの接続有無に関わらず、テスト結果は常に同じになります。
+サーバー時刻に関する情報がローカルデータに格納されていない場合、サーバーから取得します。
+
+2022.05.02 09:43でのKAGOYA + LANDでのTime系関数の実行結果
+
+TimeGMT()2022.05.02 00:43:59
+TimeCurrent()2022.05.02 00:43:59
+TimeLocal()2022.05.02 09:43:59

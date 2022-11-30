@@ -1,0 +1,30 @@
+■ea
+one_file(usdjpy)
+- 5_10_bi_buy
+- 5_10_bi_sell
+- koyo
+
+
+■tick
+decus(time_shift): good
+fxdd(normal): bad(下とも違う)
+decus(normal): bad(下とも違う)
+
+fxddはタイムシフトが作れない。
+いつまで経っても終わらない
+
+■今後
+実際のテストと以下でどれが一番近いのか
+
+・decus(time_shift)
+・fxdd(normal)
+・decus(normal)
+・Tick Data Suite(トライアルできるか)
+
+decus(time_shift)でどれくらい合っているか、
+8月上旬に確認。
+ある程度（８割）合っていればそのまま
+
+それ以下なら3ヶ月くらいデータ貯めてTick Data Suite(トライアル)
+
+再現度が高い場合は、買い切りまたはサブスクでお金払う

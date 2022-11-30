@@ -1,0 +1,23 @@
+■レンタルサーバ
+・include対象のファイルをデスクトップにおく
+・include対象のファイルforce_stop_priceを設定　　    必ずマイナス!!!!
+・include対象のファイルmin_account_moneyを設定    必ずプラス!!!!
+・ターミナル毎にMQL4\Expertsのショートカットを作成
+・my_expertというフォルダを作り、commonとeaを配置
+・タスクスケジューラでスクリプトをスケジュール設定
+・eaのstring env_nameを設定、各ea 
+・common.mqをコンパイルしてからeaをコンパイル
+
+■EA
+・アカウント認証
+・ツール オプション emailの設定
+・ツール オプション その他の設定
+・Lotsの設定
+・チャートの設定(通貨と時間足に注意!!)
+
+■規模変更
+・common.mqhのforce_stop_priceを設定　　    必ずマイナス!!!!
+・common.mqhのmin_account_moneyを設定    必ずプラス!!!!
+・各EAのnormal_lotsを変更
+・ターミナル毎にMQL4\Expertsのショートカットに新common.mqhをペースト
+・common.mqをコンパイルしてからeaをコンパイル
