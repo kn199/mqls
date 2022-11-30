@@ -13,7 +13,7 @@ input int a1_loss = 150;            // MA1:損失ポイント
 input int a1_min_lots_mode = true;  // MA1:ロット調整 0=通常, 1=0.01
 double a1_lots = AdjustLotsByLossPoint(a1_loss);
 double a1_normal_lots = a1_lots;
-input double a1_min_lots = min_lots;     // MA1:連続敗戦時の縮小ロット
+double a1_min_lots = min_lots;     // MA1:連続敗戦時の縮小ロット
 
 input int a1_continue_loss = 3;     // MA1:ロット減になる失敗連続回数
 

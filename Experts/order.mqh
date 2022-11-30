@@ -57,7 +57,7 @@ double AdjustLotsByLossPoint(const int ag_stop_point)
   double result = min_lots * (one_time_loss / ag_stop_point);
   result = NormalizeDouble(result, 1);
 
-  if (result < min_lots1){
+  if (result < min_lots){
     result = min_lots;
   }
   return(result);

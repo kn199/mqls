@@ -12,7 +12,7 @@ input int a3_loss = 120;            // MA3:損失ポイント
 input int a3_min_lots_mode = true;  // MA3:ロット調整 0=通常, 1=0.01
 double a3_lots = AdjustLotsByLossPoint(a3_loss);
 double a3_normal_lots = a3_lots;
-input double a3_min_lots = min_lots;     // MA3:連続敗戦時の縮小ロット
+double a3_min_lots = min_lots;     // MA3:連続敗戦時の縮小ロット
 
 input int a3_continue_loss = 3;     // MA3:ロット減になる失敗連続回数
 
