@@ -284,7 +284,7 @@ bool IsOkContinuos(const int ag_MAGIC, const int ag_entry_interval){
 
 // 1w:10080, 4h:240, 1h: 60
 void MakeLongCandle(const int ag_timeframe, const int ag_make_number, double &ag_highs[], double &ag_lows[],
-                    double &ag_opens[], double &ag_closes[], const string ag_current)
+                    double &ag_opens[], double &ag_closes[])
 {
   int loop_count = ag_timeframe / 60 * ag_make_number;
   int hour_unit = ag_timeframe / 60;
@@ -300,27 +300,27 @@ void MakeLongCandle(const int ag_timeframe, const int ag_make_number, double &ag
   // 4h 5本の場合 ag_timeframe: 240, ag_make_number: 5, hour_unit: 4
   for (int i=1; i <= loop_count; i++){
     if (i == 1){
-      ag_closes[0] = iClose(ag_current,60,1);
+      ag_closes[0] = iClose(NULL,60,1);
     };
 
     if (i > hour_unit && MathMod(i-1,hour_unit) == 0){
-      ag_closes[(i-1)/hour_unit] = iClose(ag_current,60,i);
+      ag_closes[(i-1)/hour_unit] = iClose(NULL,60,i);
     };
 
     if (i >= hour_unit && MathMod(i,hour_unit) == 0){
-      ag_opens[(i/hour_unit)-1] = iOpen(ag_current,60,i);
+      ag_opens[(i/hour_unit)-1] = iOpen(NULL,60,i);
     };
 
-    if (ag_highs[(i-1)/hour_unit] < iHigh(ag_current,60,i)){
-      ag_highs[(i-1)/hour_unit] = iHigh(ag_current,60,i);
+    if (ag_highs[(i-1)/hour_unit] < iHigh(NULL,60,i)){
+      ag_highs[(i-1)/hour_unit] = iHigh(NULL,60,i);
     };
 
     if (ag_lows[(i-1)/hour_unit] == 0){
-      ag_lows[(i-1)/hour_unit] = iLow(ag_current,60,i);
+      ag_lows[(i-1)/hour_unit] = iLow(NULL,60,i);
     };
 
-    if (ag_lows[(i-1)/hour_unit] > 0 && ag_lows[(i-1)/hour_unit] > iLow(ag_current,60,i)){
-      ag_lows[(i-1)/hour_unit] = iLow(ag_current,60,i);
+    if (ag_lows[(i-1)/hour_unit] > 0 && ag_lows[(i-1)/hour_unit] > iLow(NULL,60,i)){
+      ag_lows[(i-1)/hour_unit] = iLow(NULL,60,i);
     };
   };
 };

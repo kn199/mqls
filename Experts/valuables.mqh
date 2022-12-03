@@ -37,10 +37,20 @@ bool email;
 
 int day_start_hour = SUMMER_DAY_START_HOUR;
 
+double one_hour_highs[];
+double one_hour_lows[];
+double one_hour_opens[];
+double one_hour_closes[];
+
 double four_hour_highs[];
 double four_hour_lows[];
 double four_hour_opens[];
 double four_hour_closes[];
+
+double day_highs[];
+double day_lows[];
+double day_opens[];
+double day_closes[];
 
 double week_highs[];
 double week_lows[];

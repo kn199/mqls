@@ -5,7 +5,7 @@
 
 void TenSecondsIntervalMail(const int ag_timeframe, const int ag_make_number, double &ag_highs[],
                             double &ag_lows[], double &ag_opens[], double &ag_closes[],
-                            const string ag_current, const int ag_day_start_hour)
+                            const int ag_day_start_hour)
 {
   bool condition;
   bool is_calc_hour;
@@ -45,7 +45,7 @@ void TenSecondsIntervalMail(const int ag_timeframe, const int ag_make_number, do
 
   // 長時間足を作成する。30秒以降なのは、分の切り替わり直後は古い価格データになるから
   if (condition && LocalSecond() > 30) {
-    MakeLongCandle(ag_timeframe, ag_make_number, ag_highs, ag_lows, ag_opens, ag_closes, ag_current);
+    MakeLongCandle(ag_timeframe, ag_make_number, ag_highs, ag_lows, ag_opens, ag_closes);
   };
 
   string title = StringConcatenate(IntegerToString(ag_timeframe),",",IntegerToString(ag_make_number),"本");

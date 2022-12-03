@@ -18,7 +18,7 @@ double a1_min_lots = min_lots;     // MA1:連続敗戦時の縮小ロット
 input int a1_continue_loss = 3;     // MA1:ロット減になる失敗連続回数
 
 // !!!!!!!! entry_interval 100000以上に
-int a1_entry_interval = 100000;    // MA1:オーダー間隔(秒)
+int a1_entry_interval = minimum_entry_interval;
 
 int a1_entry_start_hour = twelve;
 int a1_entry_end_hour = twenty_four;
@@ -32,11 +32,11 @@ bool a1_sell_conditions = false;
 double a1_entry_price;
 datetime a1_entry_time;
 
-input int rsi_low_point = 25;
-input int rsi_high_point = 75;
+input int rsi_low_point = 25;     // MA1: rsi低ポイント
+input int rsi_high_point = 75;    // MA1: rsi高ポイント
 
-input int long_timeframe = 15;
-input int short_timeframe = 5;
+input int long_timeframe = 15;    // MA1: rsi時間軸: 長時間足
+input int short_timeframe = 5;    // MA1: rsi時間軸: 短時間足
 
 double rsi_long_1;
 double rsi_long_2;

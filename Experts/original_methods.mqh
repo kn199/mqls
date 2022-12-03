@@ -30,16 +30,18 @@ void EaStopCheck(const string current) {
   }
 };
 
-bool ChcekPriceDiff(const int timeframe, const int direct, const int point, const int shift) {
+bool ChcekPriceDiff(const int timeframe, const int direct, const double diff, const int shift) {
   bool result = false;
   if (direct != UP && direct != DOWN){
     return false;
   };
 
   if (direct == UP){
-    result = (iOpen(NULL, timeframe, shift) + point*_Point < iClose(NULL, timeframe, shift));
+    result = iOpen(NULL, timeframe, shift) < iClose(NULL, timeframe, shift) &&
+             (iOpen(NULL, timeframe, shift) + diff < iClose(NULL, timeframe, shift));
   } else {
-    result = (iOpen(NULL, timeframe, shift) - point*_Point > iClose(NULL, timeframe, shift));
+    result = iOpen(NULL, timeframe, shift) > iClose(NULL, timeframe, shift) &&
+             (iOpen(NULL, timeframe, shift) - diff > iClose(NULL, timeframe, shift));
   };
 
   return(result);
@@ -52,10 +54,20 @@ bool IsUp(const int timeframe, const int shift) {
   return(result);
 }
 
+bool IsUpCloseHighDiff(const int timeframe, const int shift, const double diff) {
+  bool result = IsUp(timeframe, shift) && iClose(NULL, timeframe, shift) + diff < iHigh(NULL, timeframe, shift);
+  return(result);
+}
+
 bool IsDown(const int timeframe, const int shift) {
   bool result;
   result = (iOpen(NULL, timeframe, shift) > iClose(NULL, timeframe, shift));
 
+  return(result);
+}
+
+bool IsDownCloseLowDiff(const int timeframe, const int shift, const double diff) {
+  bool result = IsDown(timeframe, shift) && iClose(NULL, timeframe, shift) - diff > iLow(NULL, timeframe, shift);
   return(result);
 }
 
