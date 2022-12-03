@@ -1,0 +1,1 @@
+・IsUpCloseHighDiff, IsDownCloseLowDiffでの検証
