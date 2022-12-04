@@ -1,1 +1,3 @@
 ・IsUpCloseHighDiff, IsDownCloseLowDiffでの検証
+
+・逆張り
