@@ -52,10 +52,14 @@ void NoticePrice() {
   Print("iClose(NULL,240,1), ", iClose(NULL,240,1));
   Print("iClose(NULL,1440,1), ", iClose(NULL,1440,1));
   Print("iClose(NULL,10080,1), ", iClose(NULL,10080,1));
-  Print("iOpen(NULL,60,1), ", iOpen(NULL,60,1));
-  Print("iOpen(NULL,240,1), ", iOpen(NULL,240,1));
-  Print("iOpen(NULL,1440,1), ", iOpen(NULL,1440,1));
-  Print("iOpen(NULL,10080,1), ", iOpen(NULL,10080,1));
+
+  Print("iOpen(NULL,5,1), ", iOpen(NULL,5,1));
+  Print("iOpen(NULL,5,2), ", iOpen(NULL,5,2));
+  Print("iOpen(NULL,5,3), ", iOpen(NULL,5,3));
+  Print("iOpen(NULL,60,0), ", iOpen(NULL,60,0));
+  Print("iOpen(NULL,240,0), ", iOpen(NULL,240,0));
+  Print("iOpen(NULL,1440,0), ", iOpen(NULL,1440,0));
+  Print("iOpen(NULL,10080,0), ", iOpen(NULL,10080,0));
 
   string describe1 = StringConcatenate(
                     "iClose(NULL,5,1), ", DoubleToString(iClose(NULL,5,1)),
@@ -156,13 +160,18 @@ void S7Tick(){
       is_email = false;
     };
 
+    if (TimeMinute(TimeLocal()) == 10) {
+      NoticePrice();
+      is_email = false;
+    };
+
     if (TimeMinute(TimeLocal()) == 30) {
       NoticePrice();
       is_email = false;
     };
   }
 
-  if (TimeMinute(TimeLocal()) == 6 || TimeMinute(TimeLocal()) == 31) {
+  if (TimeMinute(TimeLocal()) == 6 || TimeMinute(TimeLocal()) == 11 || TimeMinute(TimeLocal()) == 31) {
     is_email = true;
   };
 }

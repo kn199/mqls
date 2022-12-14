@@ -1,7 +1,7 @@
 #property strict
 #include "../proxy.mqh"
 
-#define MAGIC_S8 1007
+#define MAGIC_S8 1008
 
 int s8_ticket = 0;
 int s8_pos = NO_POSITION;
